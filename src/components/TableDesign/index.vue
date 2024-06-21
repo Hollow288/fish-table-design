@@ -1,7 +1,7 @@
 <script lang="ts">
 import {h, defineComponent, ref, onMounted, onBeforeUnmount} from 'vue'
 import {NButton, useMessage, NInput} from 'naive-ui'
-import type {DataTableColumns} from 'naive-ui'
+import type {DataTableColumns,MentionOption} from 'naive-ui'
 import AddSharp from '@vicons/ionicons5/AddSharp'
 import {cloneDeep} from 'lodash-es'
 
@@ -74,12 +74,6 @@ export default defineComponent({
     const editData = ref<editField[]>([])
     const windowHeight = ref(window.innerHeight)
 
-    const basicType = {
-      fieldName: '',
-      fieldType: '',
-      remark: ''
-    }
-
     const editType = {
       fieldName: '',
       fieldType: '',
@@ -103,6 +97,22 @@ export default defineComponent({
       {
         title: '对应列表字段',
         key: 'remark'
+      }
+    ]
+
+
+    const atOptions = [
+      {
+        label: 'ID',
+        value: 'ID'
+      },
+      {
+        label: 'CODE',
+        value: 'CODE'
+      },
+      {
+        label: 'NAME',
+        value: 'NAME'
       }
     ]
 
@@ -151,6 +161,8 @@ export default defineComponent({
       window.removeEventListener('resize', updateWindowHeight)
     })
 
+    const optionsRef = ref<MentionOption[]>([])
+
     return {
       height: '700',
       windowHeight,
@@ -159,6 +171,7 @@ export default defineComponent({
       editData: editData,
       editColumns: editColumns(),
       basicColumns: basicColumns,
+      options: optionsRef,
       rowKey: (row: field) => row.fieldName,
       handleCheck(rowKeys) {
         checkedRowKeysRef.value = rowKeys
@@ -181,6 +194,11 @@ export default defineComponent({
       },
       addProcessToEditData(){
         editData.value.unshift(...processData.value)
+      },
+      handleSearch (_: string, prefix: string) {
+        if (prefix === '_') {
+          optionsRef.value = atOptions
+        }
       }
     }
   }
@@ -250,7 +268,8 @@ export default defineComponent({
           <tbody>
           <tr v-for="(n, i) in editData" :key="i">
             <td><n-checkbox v-model:checked="n.isChecked"/></td>
-            <td><NInput v-model:value="n.fieldName" /></td>
+
+            <td><n-mention :options="options" :prefix="['_']" @search="handleSearch" /></td>
             <td><NInput v-model:value="n.fieldType" /></td>
             <td><NInput v-model:value="n.remark" /></td>
           </tr>
