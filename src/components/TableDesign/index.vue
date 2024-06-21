@@ -21,8 +21,9 @@ type editField = {
 
 const checkedRowKeysRef = ref<[]>([])
 
-const basicData: field[] = [
+const basicData = ref<field[]>([
   {fieldName: 'ROW_GUID', fieldType: 'varchar(64)', remark: 'uid'},
+  {fieldName: 'TO_ROW_GUID', fieldType: 'varchar(64)', remark: '主表uid'},
   {fieldName: 'CREATION_DATE', fieldType: 'datetime', remark: '申请日期'},
   {fieldName: 'CREATED_BY', fieldType: 'int', remark: '申请人id'},
   {fieldName: 'CREATED_BY_NAME', fieldType: 'varchar(50)', remark: '申请人name'},
@@ -40,20 +41,19 @@ const basicData: field[] = [
   {fieldName: 'DEPT_ID', fieldType: 'int', remark: '申请部门id'},
   {fieldName: 'DEPT_CODE', fieldType: 'varchar(150)', remark: '申请部门code'},
   {fieldName: 'DEPT_NAME', fieldType: 'varchar(350)', remark: '申请部门name'}
-]
+])
 
-const processData: field[] = [
+const processData = ref<field[]>([
   {fieldName: 'BOE_TYPE_CODE', fieldType: 'varchar(500)', remark: '单据类型-code'},
   {fieldName: 'BOE_TYPE_NAME', fieldType: 'varchar(500)', remark: '单据类型-name'},
   {fieldName: 'OPERATION_TYPE_CODE', fieldType: 'varchar(100)', remark: '业务类型-code'},
   {fieldName: 'OPERATION_TYPE_NAME', fieldType: 'varchar(100)', remark: '业务类型-name'},
   {fieldName: 'BOE_NUM', fieldType: 'varchar(50)', remark: '单据编号'},
   {fieldName: 'FLOW_STATUS', fieldType: 'varchar(228)', remark: '流程状态'}
-]
+])
 
-const childData: field[] = [
-  {fieldName: 'TO_ROW_GUID', fieldType: 'varchar(64)', remark: '主表uid'},
-]
+
+// const needData = [...basicData,...processData]
 
 
 
@@ -155,7 +155,7 @@ export default defineComponent({
       height: '700',
       windowHeight,
       AddSharp,
-      needData: [...basicData, ...processData, ...childData],
+      needData: [...basicData.value, ...processData.value],
       editData: editData,
       editColumns: editColumns(),
       basicColumns: basicColumns,
@@ -169,13 +169,18 @@ export default defineComponent({
         editData.value.push(temObj)
       },
       deleteEditData(){
-        // console.log(editData.value)
         editData.value = editData.value.filter(n=>!n.isChecked)
       },
       checkEditDetail(checked){
         editData.value.forEach(item => {
           item.isChecked = !!checked
         })
+      },
+      addBasicToEditData(){
+        editData.value.unshift(...basicData.value)
+      },
+      addProcessToEditData(){
+        editData.value.unshift(...processData.value)
       }
     }
   }
@@ -189,29 +194,17 @@ export default defineComponent({
         也许你需要这些字段
       </n-divider>
       <div style="margin-top: -25px; display: flex; justify-content: flex-end; gap: 10px;">
-        <n-button icon-placement="left" secondary strong>
+        <n-button icon-placement="left" secondary strong @click="addBasicToEditData">
           <template #icon>
             <n-icon :component="AddSharp"></n-icon>
           </template>
           {{ '基础' }}
         </n-button>
-        <n-button icon-placement="left" secondary strong>
+        <n-button icon-placement="left" secondary strong @click="addProcessToEditData">
           <template #icon>
             <n-icon :component="AddSharp"></n-icon>
           </template>
           {{ '流程' }}
-        </n-button>
-        <n-button icon-placement="left" secondary strong>
-          <template #icon>
-            <n-icon :component="AddSharp"></n-icon>
-          </template>
-          {{ '子表' }}
-        </n-button>
-        <n-button icon-placement="left" secondary strong>
-          <template #icon>
-            <n-icon :component="AddSharp"></n-icon>
-          </template>
-          {{ '所选' }}
         </n-button>
       </div>
       <n-data-table
