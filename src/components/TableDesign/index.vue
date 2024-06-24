@@ -1,5 +1,5 @@
 <script lang="ts">
-import {h, defineComponent, ref, onMounted, onBeforeUnmount} from 'vue'
+import {h, defineComponent, ref, onMounted, onBeforeUnmount, watch} from 'vue'
 import {NButton, useMessage, NInput} from 'naive-ui'
 import type {DataTableColumns,MentionOption} from 'naive-ui'
 import AddSharp from '@vicons/ionicons5/AddSharp'
@@ -101,7 +101,7 @@ export default defineComponent({
     ]
 
 
-    const atOptions = [
+    const nameOptions = [
       {
         label: 'ID',
         value: 'ID'
@@ -114,6 +114,38 @@ export default defineComponent({
         label: 'NAME',
         value: 'NAME'
       }
+    ]
+
+
+    const typeOptions = [
+      {
+        label: 'int',
+        value: 'int'
+      },
+      {
+        label: 'numeric(18, 2)',
+        value: 'numeric(18, 2)'
+      },
+      {
+        label: 'numeric(18, 6)',
+        value: 'numeric(18, 6)'
+      },
+      {
+        label: 'varchar(100)',
+        value: 'varchar(100)'
+      },
+      {
+        label: 'varchar(200)',
+        value: 'varchar(200)'
+      },
+      {
+        label: 'varchar(500)',
+        value: 'varchar(500)'
+      },
+      {
+        label: 'varchar(3000)',
+        value: 'varchar(3000)'
+      },
     ]
 
     const editColumns = (): DataTableColumns<field> => [
@@ -163,6 +195,15 @@ export default defineComponent({
 
     const optionsRef = ref<MentionOption[]>([])
 
+
+    watch(editData, (newVal, oldVal) => {
+      newVal.forEach(item => {
+        if (item.fieldName) {
+          item.fieldName = item.fieldName.toUpperCase()
+        }
+      })
+    }, { deep: true })
+
     return {
       height: '700',
       windowHeight,
@@ -171,13 +212,15 @@ export default defineComponent({
       editData: editData,
       editColumns: editColumns(),
       basicColumns: basicColumns,
-      options: optionsRef,
+      nameOptions: optionsRef,
+      typeOptions: typeOptions,
       rowKey: (row: field) => row.fieldName,
       handleCheck(rowKeys) {
         checkedRowKeysRef.value = rowKeys
       },
       addEditData() {
         const temObj = cloneDeep(editType)
+        temObj.fieldType = 'varchar(128)'
         temObj.uuid = generateUUID()
         editData.value.push(temObj)
       },
@@ -195,9 +238,9 @@ export default defineComponent({
       addProcessToEditData(){
         editData.value.unshift(...processData.value)
       },
-      handleSearch (_: string, prefix: string) {
+      nameHandleSearch (_: string, prefix: string) {
         if (prefix === '_') {
-          optionsRef.value = atOptions
+          optionsRef.value = nameOptions
         }
       }
     }
@@ -266,11 +309,11 @@ export default defineComponent({
           </tr>
           </thead>
           <tbody>
-          <tr v-for="(n, i) in editData" :key="i">
+          <tr v-for="(n, i) in editData" :key="i" style="height: 10px">
             <td><n-checkbox v-model:checked="n.isChecked"/></td>
 
-            <td><n-mention :options="options" :prefix="['_']" @search="handleSearch" /></td>
-            <td><NInput v-model:value="n.fieldType" /></td>
+            <td><n-mention v-model:value="n.fieldName" :options="nameOptions" :prefix="['_']" @search="nameHandleSearch" /></td>
+            <td><n-select v-model:value="n.fieldType" filterable tag :options="typeOptions" /></td>
             <td><NInput v-model:value="n.remark" /></td>
           </tr>
           </tbody>
