@@ -2,11 +2,12 @@ import { RouteRecordRaw, createWebHistory, createRouter } from "vue-router";
 
 const routes: Array<RouteRecordRaw> = [
     {
-        path: '/',
-        component: () => import('../components/TableDesign/index.vue')  // 首页组件
-    }, {
-        path: '/about',
-        component: () => import('../components/TableDesign/index.vue')  // 关于我们组件
+        path: '/table-design',
+        component: () => import('@/components/TableDesign')  // 首页组件
+    },
+    {
+        path: '/full-calendar-test',
+        component: () => import('@/components/FullCalendarTest')  // 首页组件
     }
 ]
 

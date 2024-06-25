@@ -1,8 +1,13 @@
 <script lang="ts">
-import {h, defineComponent, ref, onMounted, onBeforeUnmount, watch} from 'vue'
-import {NButton, useMessage, NInput} from 'naive-ui'
+import {h, defineComponent, ref, onMounted, onBeforeUnmount, watch, reactive} from 'vue'
+import {NButton, useMessage, NInput, UploadFileInfo} from 'naive-ui'
 import type {DataTableColumns,MentionOption} from 'naive-ui'
 import AddSharp from '@vicons/ionicons5/AddSharp'
+import Search from '@vicons/ionicons5/Search'
+import KeyOutline from '@vicons/ionicons5/KeyOutline'
+import TrashBinOutline from '@vicons/ionicons5/TrashBinOutline'
+import CloudUploadOutline from '@vicons/ionicons5/CloudUploadOutline'
+import CloudDownloadOutline from '@vicons/ionicons5/CloudDownloadOutline'
 import {cloneDeep} from 'lodash-es'
 
 type field = {
@@ -16,10 +21,22 @@ type editField = {
   fieldType: string
   remark: string,
   uuid: string,
-  isChecked: boolean
+  isChecked: boolean,
+  isPrimaryKey: boolean
 }
 
+const editData = ref<editField[]>([])
+
 const checkedRowKeysRef = ref<[]>([])
+
+const fileList = ref<UploadFileInfo[]>([])
+
+const fileListRef = ref([])
+
+
+const queryParams = reactive({
+  searchText: ''
+})
 
 const basicData = ref<field[]>([
   {fieldName: 'ROW_GUID', fieldType: 'varchar(64)', remark: 'uid'},
@@ -53,8 +70,7 @@ const processData = ref<field[]>([
 ])
 
 
-// const needData = [...basicData,...processData]
-
+const submitLoading = ref(false)
 
 
 const generateUUID = ()=> {
@@ -68,10 +84,13 @@ const generateUUID = ()=> {
 
 
 export default defineComponent({
+  components:{
+    KeyOutline,TrashBinOutline
+  },
   setup() {
     const message = useMessage()
 
-    const editData = ref<editField[]>([])
+
     const windowHeight = ref(window.innerHeight)
 
     const editType = {
@@ -79,7 +98,8 @@ export default defineComponent({
       fieldType: '',
       remark: '',
       uuid:'',
-      isChecked:false
+      isChecked:false,
+      isPrimaryKey:false
     }
 
     const basicColumns = [
@@ -196,6 +216,53 @@ export default defineComponent({
     const optionsRef = ref<MentionOption[]>([])
 
 
+    const handleChange = (options: { fileList: UploadFileInfo[] }) => {
+      const files = options.fileList.map(item => item.file)
+      fileListRef.value = files.filter((n, index) => index === files.length - 1)
+      const fileData = new FormData()
+      fileListRef.value.forEach(file => {
+        fileData.append('file', file)
+      })
+      UploadAPI.uploadFile(fileData).then(result=>{
+        if(result.status == '200'){
+          if(result.data.status == '200'){
+            editData.value = result.data.data
+            message.success('导入成功')
+          }else{
+            message.error(result.data.message)
+          }
+        }else{
+          message.error('出错了')
+        }
+      })
+
+    }
+
+
+    const exportFile = () =>{
+
+      // const temObj = {data: editData.value}
+
+      UploadAPI.exportFile(editData.value).then(result => {
+
+        const blob = new Blob([result], {type: 'application/octet-stream'})
+        // 创建一个临时 URL
+        const url = window.URL.createObjectURL(blob)
+        // 创建一个下载链接
+        const a = document.createElement('a')
+        a.href = url
+        a.download = `output.docx` // 设置下载的文件名
+        a.target = '_blank'
+        // 触发点击事件，开始下载
+        document.body.appendChild(a)
+        a.click()
+        // 清理临时 URL
+        window.URL.revokeObjectURL(url)
+        messages.success(`导出成功：output.docx`)
+      })
+    }
+
+
     watch(editData, (newVal, oldVal) => {
       newVal.forEach(item => {
         if (item.fieldName) {
@@ -208,6 +275,15 @@ export default defineComponent({
       height: '700',
       windowHeight,
       AddSharp,
+      Search,
+      TrashBinOutline,
+      CloudUploadOutline,
+      queryParams,
+      submitLoading,
+      handleChange,
+      CloudDownloadOutline,
+      fileList,
+      exportFile,
       needData: [...basicData.value, ...processData.value],
       editData: editData,
       editColumns: editColumns(),
@@ -220,7 +296,6 @@ export default defineComponent({
       },
       addEditData() {
         const temObj = cloneDeep(editType)
-        temObj.fieldType = 'varchar(128)'
         temObj.uuid = generateUUID()
         editData.value.push(temObj)
       },
@@ -229,7 +304,7 @@ export default defineComponent({
       },
       checkEditDetail(checked){
         editData.value.forEach(item => {
-          item.isChecked = !!checked
+          item.isChecked = checked
         })
       },
       addBasicToEditData(){
@@ -242,6 +317,21 @@ export default defineComponent({
         if (prefix === '_') {
           optionsRef.value = nameOptions
         }
+      },
+      getRowStyle(row){
+        return {
+          backgroundColor: row.isPrimaryKey ? 'green' : ''
+        };
+      },
+      setPrimaryKeyDblClick(n){
+        n.isPrimaryKey = !n.isPrimaryKey
+        n.isChecked = false
+      },
+      searchTableByName(){
+        message.info("1111")
+      },
+      searchFieldByName(){
+        message.info("2222")
       }
     }
   }
@@ -280,11 +370,30 @@ export default defineComponent({
           class="table-font-size"
       />
     </n-grid-item>
-    <n-grid-item>
+    <n-grid-item >
       <n-divider title-placement="left" style="margin-top: 10px">
         最终会生成的
       </n-divider>
       <div style="margin-top: -25px; display: flex; justify-content: flex-end; gap: 10px;">
+        <n-button icon-placement="left" secondary strong @click="exportFile">
+          <template #icon>
+            <n-icon :component="CloudDownloadOutline"></n-icon>
+          </template>
+          {{ '导出' }}
+        </n-button>
+        <n-upload
+            v-model:file-list="fileList"
+            ref="upload"
+            @change="handleChange"
+            :show-file-list="false"
+        >
+          <n-button icon-placement="left" secondary strong >
+            <template #icon>
+              <n-icon :component="CloudUploadOutline"></n-icon>
+            </template>
+            {{ '导入' }}
+          </n-button>
+        </n-upload>
         <n-button icon-placement="left" secondary strong @click="addEditData">
           <template #icon>
             <n-icon :component="AddSharp"></n-icon>
@@ -293,7 +402,7 @@ export default defineComponent({
         </n-button>
         <n-button icon-placement="left" secondary strong @click="deleteEditData">
           <template #icon>
-            <n-icon :component="AddSharp"></n-icon>
+            <n-icon :component="TrashBinOutline"></n-icon>
           </template>
           {{ '删除' }}
         </n-button>
@@ -301,7 +410,7 @@ export default defineComponent({
       <div class="table-wrapper" :style="{ maxHeight: `${windowHeight - 100}px` }">
         <NTable class="custom-table" size="small" style="margin-top: 5px">
           <thead>
-          <tr>
+          <tr  >
             <th><n-checkbox @change="checkEditDetail"/></th>
             <th>{{ '字段名称' }}</th>
             <th>{{ '类型' }}</th>
@@ -309,12 +418,11 @@ export default defineComponent({
           </tr>
           </thead>
           <tbody>
-          <tr v-for="(n, i) in editData" :key="i" style="height: 10px">
-            <td><n-checkbox v-model:checked="n.isChecked"/></td>
-
-            <td><n-mention v-model:value="n.fieldName" :options="nameOptions" :prefix="['_']" @search="nameHandleSearch" /></td>
+          <tr v-for="(n, i) in editData" :key="i" @dblclick="setPrimaryKeyDblClick(n)" >
+            <td><n-checkbox v-model:checked="n.isChecked" v-if="!n.isPrimaryKey"/>  <n-icon size="15" v-else><key-outline/></n-icon></td>
+            <td><n-mention v-model:value="n.fieldName" :options="nameOptions" :prefix="['_']" @search="nameHandleSearch"/></td>
             <td><n-select v-model:value="n.fieldType" filterable tag :options="typeOptions" /></td>
-            <td><NInput v-model:value="n.remark" /></td>
+            <td><NInput v-model:value="n.remark" placeholder=""/></td>
           </tr>
           </tbody>
         </NTable>
@@ -325,24 +433,28 @@ export default defineComponent({
         原表中所存在的
       </n-divider>
       <div style="margin-top: -25px; display: flex; justify-content: flex-end; gap: 10px;">
-        <n-button icon-placement="left" secondary strong>
-          <template #icon>
-            <n-icon :component="AddSharp"></n-icon>
+        <NInput
+            v-model:value="queryParams.searchText"
+
+            clearable
+            placeholder="表名"
+            @keydown.enter=""
+        >
+          <template #suffix>
+              <NIcon :component="Search" @click="searchTableByName" style="cursor: pointer;"/>
           </template>
-          {{ '基础' }}
-        </n-button>
-        <n-button icon-placement="left" secondary strong>
-          <template #icon>
-            <n-icon :component="AddSharp"></n-icon>
+        </NInput>
+        <NInput
+            v-model:value="queryParams.searchText"
+            clearable
+            placeholder="字段/备注"
+            @keydown.enter=""
+        >
+          <template #suffix>
+            <NIcon :component="Search" @click="searchFieldByName" style="cursor: pointer;"
+            />
           </template>
-          {{ '流程' }}
-        </n-button>
-        <n-button icon-placement="left" secondary strong>
-          <template #icon>
-            <n-icon :component="AddSharp"></n-icon>
-          </template>
-          {{ '子表' }}
-        </n-button>
+        </NInput>
         <n-button icon-placement="left" secondary strong style="margin-right: 5px">
           <template #icon>
             <n-icon :component="AddSharp"></n-icon>
