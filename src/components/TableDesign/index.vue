@@ -241,24 +241,25 @@ export default defineComponent({
 
     const exportFile = () =>{
 
-      // const temObj = {data: editData.value}
-
       UploadAPI.exportFile(editData.value).then(result => {
 
-        const blob = new Blob([result], {type: 'application/octet-stream'})
+        const blob = result.data;
         // 创建一个临时 URL
-        const url = window.URL.createObjectURL(blob)
+        const url = window.URL.createObjectURL(blob);
+
         // 创建一个下载链接
-        const a = document.createElement('a')
-        a.href = url
-        a.download = `output.docx` // 设置下载的文件名
-        a.target = '_blank'
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `output.docx`; // 设置下载的文件名
+        a.target = '_blank';
+
         // 触发点击事件，开始下载
-        document.body.appendChild(a)
-        a.click()
+        document.body.appendChild(a);
+        a.click();
+
         // 清理临时 URL
-        window.URL.revokeObjectURL(url)
-        messages.success(`导出成功：output.docx`)
+        window.URL.revokeObjectURL(url);
+        message.success(`导出成功：output.docx`);
       })
     }
 

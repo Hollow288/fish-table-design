@@ -22,7 +22,7 @@ export class UploadAPI {
 
 
   static exportFile(data: any){
-    return httpRequest.post(`${this.EXPORT_API_PREFIX}`, {data}, {responseType: 'blob' })
+    return httpRequest.post(`${this.EXPORT_API_PREFIX}`, data, {responseType: 'blob' })
   }
 
 
