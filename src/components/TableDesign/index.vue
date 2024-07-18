@@ -8,6 +8,8 @@ import KeyOutline from '@vicons/ionicons5/KeyOutline'
 import TrashBinOutline from '@vicons/ionicons5/TrashBinOutline'
 import CloudUploadOutline from '@vicons/ionicons5/CloudUploadOutline'
 import CloudDownloadOutline from '@vicons/ionicons5/CloudDownloadOutline'
+import ClipboardOutline from '@vicons/ionicons5/ClipboardOutline'
+import LanguageOutline from '@vicons/ionicons5/LanguageOutline'
 import {cloneDeep} from 'lodash-es'
 
 type field = {
@@ -28,6 +30,10 @@ type editField = {
 const editData = ref<editField[]>([])
 
 const checkedRowKeysRef = ref<[]>([])
+
+const translationRequired = ref<string>('')
+
+const translationResult = ref<string>('')
 
 const fileList = ref<UploadFileInfo[]>([])
 
@@ -267,7 +273,7 @@ export default defineComponent({
     watch(editData, (newVal, oldVal) => {
       newVal.forEach(item => {
         if (item.fieldName) {
-          item.fieldName = item.fieldName.toUpperCase()
+          item.fieldName = item.fieldName.replace(/\s+/g, '').toUpperCase();
         }
       })
     }, { deep: true })
@@ -283,8 +289,12 @@ export default defineComponent({
       submitLoading,
       handleChange,
       CloudDownloadOutline,
+      ClipboardOutline,
+      LanguageOutline,
       fileList,
       exportFile,
+      translationRequired,
+      translationResult,
       needData: [...basicData.value, ...processData.value],
       editData: editData,
       editColumns: editColumns(),
@@ -333,6 +343,16 @@ export default defineComponent({
       },
       searchFieldByName(){
         message.info("2222")
+      },
+      generateResults(){
+        translationResult.value = "h.select("+translationRequired.value+")"
+      },
+      copyResult(){
+        navigator.clipboard.writeText(translationResult.value).then(() => {
+          message.success('文本已复制到剪贴板');
+        }).catch(err => {
+          message.error('复制失败: ' + err);
+        });
       }
     }
   }
@@ -366,10 +386,38 @@ export default defineComponent({
           :bordered="false"
           :row-key="rowKey"
           style="margin-top: 5px;"
-          :style="{ height: `${windowHeight - 100}px` }"
+          :style="{ height: `${windowHeight - 400}px` }"
           flex-height
           class="table-font-size"
       />
+      <n-divider title-placement="left" style="margin-top: 10px">
+        其他辅助
+      </n-divider>
+      <div style="background-color: rgba(144,238,144,0.22); height: 250px; margin-top: -15px; display: flex;">
+        <div style="width: 50%;">
+          <NInput
+              v-model:value="translationRequired"
+              placeholder="翻译"
+              @keydown.enter="generateResults"
+          >
+            <template #suffix>
+              <NIcon :component="LanguageOutline" @click="generateResults" style="cursor: pointer;" />
+            </template>
+          </NInput>
+        </div>
+        <div style="width: 50%;">
+          <NInput
+              v-model:value="translationResult"
+              placeholder="结果"
+              @keydown.enter="copyResult"
+          >
+            <template #suffix>
+              <NIcon :component="ClipboardOutline" @click="copyResult" style="cursor: pointer;" />
+            </template>
+          </NInput>
+        </div>
+      </div>
+
     </n-grid-item>
     <n-grid-item >
       <n-divider title-placement="left" style="margin-top: 10px">
