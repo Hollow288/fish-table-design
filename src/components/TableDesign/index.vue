@@ -44,7 +44,8 @@ const fileListRef = ref([])
 
 
 const queryParams = reactive({
-  searchText: ''
+  searchTableText: '',
+  searchFieldText: ''
 })
 
 const basicData = ref<field[]>([
@@ -344,10 +345,15 @@ export default defineComponent({
       },
       searchTableByName(){origData
         //
-        TableDesignAPI.tableDesignByTableName(queryParams.searchText).then(result=>{
+        TableDesignAPI.tableDesignByTableName(queryParams.searchTableText).then(result=>{
           if(result.status == 200){
-            origData.value = result.data
-            message.success("搜索成功")
+            if(result.data.length > 0){
+              origData.value = result.data
+              message.success("搜索成功")
+            }else{
+              message.warning("没查到啊")
+            }
+
           }else{
             message.error("出错了")
           }
@@ -405,9 +411,9 @@ export default defineComponent({
           class="table-font-size"
       />
       <n-divider title-placement="left" style="margin-top: 10px">
-        其他辅助
+        翻译
       </n-divider>
-      <div style="background-color: rgba(144,238,144,0.22); height: 250px; margin-top: -15px; display: flex;">
+      <div style=" margin-top: -15px; display: flex;">
         <div style="width: 50%;">
           <NInput
               v-model:value="translationRequired"
@@ -429,6 +435,21 @@ export default defineComponent({
               <NIcon :component="ClipboardOutline" @click="copyResult" style="cursor: pointer;" />
             </template>
           </NInput>
+        </div>
+      </div>
+      <n-divider title-placement="left" style="margin-top: 10px">
+        其他辅助
+      </n-divider>
+      <div style="height: 50px; margin-top: -15px; display: flex;">
+        <div style="width: 50%;">
+          <n-button icon-placement="left" secondary strong style="margin-right: 5px">
+            <template #icon>
+              <n-icon :component="AddSharp"></n-icon>
+            </template>
+            {{ '复制最终SQL' }}
+          </n-button>
+        </div>
+        <div style="width: 50%;">
         </div>
       </div>
 
@@ -497,18 +518,18 @@ export default defineComponent({
       </n-divider>
       <div style="margin-top: -25px; display: flex; justify-content: flex-end; gap: 10px;">
         <NInput
-            v-model:value="queryParams.searchText"
+            v-model:value="queryParams.searchTableText"
 
             clearable
             placeholder="表名"
-            @keydown.enter=""
+            @keydown.enter="searchTableByName"
         >
           <template #suffix>
               <NIcon :component="Search" @click="searchTableByName" style="cursor: pointer;"/>
           </template>
         </NInput>
         <NInput
-            v-model:value="queryParams.searchText"
+            v-model:value="queryParams.searchFieldText"
             clearable
             placeholder="字段/备注"
             @keydown.enter=""
