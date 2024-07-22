@@ -11,6 +11,7 @@ import CloudDownloadOutline from '@vicons/ionicons5/CloudDownloadOutline'
 import ClipboardOutline from '@vicons/ionicons5/ClipboardOutline'
 import LanguageOutline from '@vicons/ionicons5/LanguageOutline'
 import {cloneDeep} from 'lodash-es'
+import {TableDesignAPI} from "@/api/tableDesign";
 
 type field = {
   fieldName: string
@@ -28,6 +29,8 @@ type editField = {
 }
 
 const editData = ref<editField[]>([])
+
+const origData = ref<field[]>([])
 
 const checkedRowKeysRef = ref<[]>([])
 
@@ -292,6 +295,7 @@ export default defineComponent({
       ClipboardOutline,
       LanguageOutline,
       fileList,
+      origData,
       exportFile,
       translationRequired,
       translationResult,
@@ -338,8 +342,18 @@ export default defineComponent({
         n.isPrimaryKey = !n.isPrimaryKey
         n.isChecked = false
       },
-      searchTableByName(){
-        message.info("1111")
+      searchTableByName(){origData
+        //
+        TableDesignAPI.tableDesignByTableName(queryParams.searchText).then(result=>{
+          if(result.status == 200){
+            origData.value = result.data
+            message.success("搜索成功")
+          }else{
+            message.error("出错了")
+          }
+
+        })
+
       },
       searchFieldByName(){
         message.info("2222")
@@ -514,7 +528,7 @@ export default defineComponent({
       <n-data-table
           size="small"
           :columns="basicColumns"
-          :data="needData"
+          :data="origData"
           :bordered="false"
           :row-key="rowKey"
           style="margin-top: 5px;"

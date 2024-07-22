@@ -6,6 +6,7 @@
 export {}
 declare global {
   const EffectScope: typeof import('vue')['EffectScope']
+  const TableDesignAPI: typeof import('../src/api/tableDesign')['TableDesignAPI']
   const UploadAPI: typeof import('../src/api/upload')['UploadAPI']
   const computed: typeof import('vue')['computed']
   const createApp: typeof import('vue')['createApp']
@@ -76,6 +77,7 @@ declare module 'vue' {
   interface GlobalComponents {}
   interface ComponentCustomProperties {
     readonly EffectScope: UnwrapRef<typeof import('vue')['EffectScope']>
+    readonly TableDesignAPI: UnwrapRef<typeof import('../src/api/tableDesign')['TableDesignAPI']>
     readonly UploadAPI: UnwrapRef<typeof import('../src/api/upload')['UploadAPI']>
     readonly computed: UnwrapRef<typeof import('vue')['computed']>
     readonly createApp: UnwrapRef<typeof import('vue')['createApp']>
@@ -139,6 +141,7 @@ declare module '@vue/runtime-core' {
   interface GlobalComponents {}
   interface ComponentCustomProperties {
     readonly EffectScope: UnwrapRef<typeof import('vue')['EffectScope']>
+    readonly TableDesignAPI: UnwrapRef<typeof import('../src/api/tableDesign')['TableDesignAPI']>
     readonly UploadAPI: UnwrapRef<typeof import('../src/api/upload')['UploadAPI']>
     readonly computed: UnwrapRef<typeof import('vue')['computed']>
     readonly createApp: UnwrapRef<typeof import('vue')['createApp']>
