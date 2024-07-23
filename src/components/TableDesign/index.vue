@@ -1,7 +1,7 @@
 <script lang="ts">
 import {h, defineComponent, ref, onMounted, onBeforeUnmount, watch, reactive} from 'vue'
 import {NButton, useMessage, NInput, UploadFileInfo} from 'naive-ui'
-import type {DataTableColumns,MentionOption} from 'naive-ui'
+import type {DataTableColumns,MentionOption, DataTableRowKey } from 'naive-ui'
 import AddSharp from '@vicons/ionicons5/AddSharp'
 import Search from '@vicons/ionicons5/Search'
 import KeyOutline from '@vicons/ionicons5/KeyOutline'
@@ -70,6 +70,12 @@ const basicData = ref<field[]>([
   {fieldName: 'DEPT_NAME', fieldType: 'varchar(350)', remark: '申请部门name'}
 ])
 
+const basicNameData = ref(["ROW_GUID","TO_ROW_GUID","CREATION_DATE","CREATED_BY",
+  "CREATED_BY_NAME","CREATED_BY_NUMBER","LAST_UPDATE_DATE","LAST_UPDATED_BY",
+  "LAST_UPDATED_BY_NAME","LAST_UPDATED_BY_NUMBER","ENABLED_FLAG","ATTRIBUTE1",
+  "ATTRIBUTE2","ATTRIBUTE3","ATTRIBUTE4","DEPT_ID",
+  "DEPT_CODE","DEPT_NAME"])
+
 const processData = ref<field[]>([
   {fieldName: 'BOE_TYPE_CODE', fieldType: 'varchar(500)', remark: '单据类型-code'},
   {fieldName: 'BOE_TYPE_NAME', fieldType: 'varchar(500)', remark: '单据类型-name'},
@@ -78,6 +84,10 @@ const processData = ref<field[]>([
   {fieldName: 'BOE_NUM', fieldType: 'varchar(50)', remark: '单据编号'},
   {fieldName: 'FLOW_STATUS', fieldType: 'varchar(228)', remark: '流程状态'}
 ])
+
+
+const processNameData = ref(["BOE_TYPE_CODE","BOE_TYPE_NAME","OPERATION_TYPE_CODE","OPERATION_TYPE_NAME",
+  "BOE_NUM","FLOW_STATUS"])
 
 
 const submitLoading = ref(false)
@@ -159,6 +169,10 @@ export default defineComponent({
       {
         label: 'numeric(18, 6)',
         value: 'numeric(18, 6)'
+      },
+      {
+        label: 'datetime',
+        value: 'datetime'
       },
       {
         label: 'varchar(100)',
@@ -282,6 +296,12 @@ export default defineComponent({
       })
     }, { deep: true })
 
+    const needData =  ref([...basicData.value, ...processData.value])
+
+    const checkedNeedRowKeysRef = ref<DataTableRowKey[]>([])
+
+    const checkedOrigRowKeysRef = ref<DataTableRowKey[]>([])
+
     return {
       height: '700',
       windowHeight,
@@ -300,16 +320,13 @@ export default defineComponent({
       exportFile,
       translationRequired,
       translationResult,
-      needData: [...basicData.value, ...processData.value],
+      needData: needData,
       editData: editData,
       editColumns: editColumns(),
       basicColumns: basicColumns,
       nameOptions: optionsRef,
       typeOptions: typeOptions,
       rowKey: (row: field) => row.fieldName,
-      handleCheck(rowKeys) {
-        checkedRowKeysRef.value = rowKeys
-      },
       addEditData() {
         const temObj = cloneDeep(editType)
         temObj.uuid = generateUUID()
@@ -324,9 +341,11 @@ export default defineComponent({
         })
       },
       addBasicToEditData(){
+        editData.value = editData.value.filter(item => !basicNameData.value.includes(item.fieldName));
         editData.value.unshift(...basicData.value)
       },
       addProcessToEditData(){
+        editData.value = editData.value.filter(item => !processNameData.value.includes(item.fieldName));
         editData.value.unshift(...processData.value)
       },
       nameHandleSearch (_: string, prefix: string) {
@@ -373,7 +392,33 @@ export default defineComponent({
         }).catch(err => {
           message.error('复制失败: ' + err);
         });
-      }
+      },
+      addCheckedToEditData(){
+        const filteredData = ref([])
+        filteredData.value = needData.value.filter(item => checkedNeedRowKeysRef.value.includes(item.fieldName));
+        editData.value = editData.value.filter(item => !checkedNeedRowKeysRef.value.includes(item.fieldName));
+        editData.value.unshift(...filteredData.value)
+      },
+      handleNeedCheck(rowKeys: DataTableRowKey[]){
+        checkedNeedRowKeysRef.value = rowKeys
+      },
+      handleOrigCheck(rowKeys: DataTableRowKey[]){
+        checkedOrigRowKeysRef.value = rowKeys
+      },
+      addOrigCheckedToEditData(){
+        const filteredData = ref([])
+        debugger
+        filteredData.value = origData.value.filter(item => checkedOrigRowKeysRef.value.includes(item.fieldName));
+        editData.value = editData.value.filter(item => !checkedOrigRowKeysRef.value.includes(item.fieldName));
+        editData.value.unshift(...filteredData.value)
+      },
+      rowProps: (row: field) => ({
+        style: 'cursor: pointer;',
+        onDblclick: () => {
+          editData.value = editData.value.filter(item => row.fieldName != item.fieldName)
+          editData.value.push(row)
+        }
+      }),
     }
   }
 })
@@ -398,6 +443,12 @@ export default defineComponent({
           </template>
           {{ '流程' }}
         </n-button>
+        <n-button icon-placement="left" secondary strong style="margin-right: 5px" @click="addCheckedToEditData">
+          <template #icon>
+            <n-icon :component="AddSharp"></n-icon>
+          </template>
+          {{ '所选' }}
+        </n-button>
       </div>
       <n-data-table
           size="small"
@@ -409,6 +460,7 @@ export default defineComponent({
           :style="{ height: `${windowHeight - 400}px` }"
           flex-height
           class="table-font-size"
+          @update:checked-row-keys="handleNeedCheck"
       />
       <n-divider title-placement="left" style="margin-top: 10px">
         翻译
@@ -539,7 +591,7 @@ export default defineComponent({
             />
           </template>
         </NInput>
-        <n-button icon-placement="left" secondary strong style="margin-right: 5px">
+        <n-button icon-placement="left" secondary strong style="margin-right: 5px" @click="addOrigCheckedToEditData">
           <template #icon>
             <n-icon :component="AddSharp"></n-icon>
           </template>
@@ -548,6 +600,7 @@ export default defineComponent({
       </div>
       <n-data-table
           size="small"
+          :row-props="rowProps"
           :columns="basicColumns"
           :data="origData"
           :bordered="false"
@@ -556,6 +609,7 @@ export default defineComponent({
           :style="{ height: `${windowHeight - 100}px` }"
           flex-height
           class="table-font-size"
+          @update:checked-row-keys="handleOrigCheck"
       />
     </n-grid-item>
   </n-grid>
