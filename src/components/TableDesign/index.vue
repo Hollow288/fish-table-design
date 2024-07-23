@@ -113,6 +113,15 @@ export default defineComponent({
 
     const windowHeight = ref(window.innerHeight)
 
+
+    const needData =  ref([...basicData.value, ...processData.value])
+
+    const checkedNeedRowKeysRef = ref<DataTableRowKey[]>([])
+
+    const checkedOrigRowKeysRef = ref<DataTableRowKey[]>([])
+
+    const tableName = ref('')
+
     const editType = {
       fieldName: '',
       fieldType: '',
@@ -296,11 +305,12 @@ export default defineComponent({
       })
     }, { deep: true })
 
-    const needData =  ref([...basicData.value, ...processData.value])
 
-    const checkedNeedRowKeysRef = ref<DataTableRowKey[]>([])
+    watch(tableName, (newVal, oldVal) => {
+      tableName.value = newVal.replace(/\s+/g, '').toUpperCase();
+    }, { deep: true })
 
-    const checkedOrigRowKeysRef = ref<DataTableRowKey[]>([])
+
 
     return {
       height: '700',
@@ -317,6 +327,7 @@ export default defineComponent({
       LanguageOutline,
       fileList,
       origData,
+      tableName,
       exportFile,
       translationRequired,
       translationResult,
@@ -381,7 +392,7 @@ export default defineComponent({
 
       },
       searchFieldByName(){
-        message.info("2222")
+        message.info("怎么做")
       },
       generateResults(){
         translationResult.value = "h.select("+translationRequired.value+")"
@@ -407,7 +418,6 @@ export default defineComponent({
       },
       addOrigCheckedToEditData(){
         const filteredData = ref([])
-        debugger
         filteredData.value = origData.value.filter(item => checkedOrigRowKeysRef.value.includes(item.fieldName));
         editData.value = editData.value.filter(item => !checkedOrigRowKeysRef.value.includes(item.fieldName));
         editData.value.unshift(...filteredData.value)
@@ -419,6 +429,21 @@ export default defineComponent({
           editData.value.push(row)
         }
       }),
+      copySqlRemark(){
+        const resultSql = ref('')
+        const temSql = ref('')
+        editData.value.forEach(n=>{
+          temSql.value += "exec sp_addextendedproperty 'MS_Description', N'" + n.remark + "', 'SCHEMA', 'dbo', 'TABLE', '" + tableName.value + "', 'COLUMN','" + n.fieldName + "'"
+          resultSql.value += temSql.value + "\n" + "go" + "\n\n"
+          temSql.value = ''
+        })
+
+        navigator.clipboard.writeText(resultSql.value).then(() => {
+          message.success('文本已复制到剪贴板');
+        }).catch(err => {
+          message.error('复制失败: ' + err);
+        });
+      }
     }
   }
 })
@@ -471,6 +496,7 @@ export default defineComponent({
               v-model:value="translationRequired"
               placeholder="翻译"
               @keydown.enter="generateResults"
+              style="margin-left: 5px"
           >
             <template #suffix>
               <NIcon :component="LanguageOutline" @click="generateResults" style="cursor: pointer;" />
@@ -482,6 +508,7 @@ export default defineComponent({
               v-model:value="translationResult"
               placeholder="结果"
               @keydown.enter="copyResult"
+              style="margin-left: 10px;margin-right: 15px"
           >
             <template #suffix>
               <NIcon :component="ClipboardOutline" @click="copyResult" style="cursor: pointer;" />
@@ -492,17 +519,15 @@ export default defineComponent({
       <n-divider title-placement="left" style="margin-top: 10px">
         其他辅助
       </n-divider>
-      <div style="height: 50px; margin-top: -15px; display: flex;">
-        <div style="width: 50%;">
-          <n-button icon-placement="left" secondary strong style="margin-right: 5px">
-            <template #icon>
-              <n-icon :component="AddSharp"></n-icon>
-            </template>
-            {{ '复制最终SQL' }}
-          </n-button>
-        </div>
-        <div style="width: 50%;">
-        </div>
+      <div style=" margin-top: -15px; display: flex;">
+        <NInput v-model:value="tableName" placeholder="表名" style="margin-left: 5px"/>
+        <n-button icon-placement="left" secondary strong style="margin-left: 5px" @click="copySqlRemark">
+          <template #icon>
+            <n-icon :component="ClipboardOutline"></n-icon>
+          </template>
+          {{ 'sql注解' }}
+        </n-button>
+
       </div>
 
     </n-grid-item>
