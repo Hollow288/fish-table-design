@@ -10,6 +10,7 @@ import CloudUploadOutline from '@vicons/ionicons5/CloudUploadOutline'
 import CloudDownloadOutline from '@vicons/ionicons5/CloudDownloadOutline'
 import ClipboardOutline from '@vicons/ionicons5/ClipboardOutline'
 import LanguageOutline from '@vicons/ionicons5/LanguageOutline'
+import CopyOutline from '@vicons/ionicons5/CopyOutline'
 import {cloneDeep} from 'lodash-es'
 import {TableDesignAPI} from "@/api/tableDesign";
 
@@ -105,7 +106,7 @@ const generateUUID = ()=> {
 
 export default defineComponent({
   components:{
-    KeyOutline,TrashBinOutline
+    KeyOutline,TrashBinOutline,CopyOutline
   },
   setup() {
     const message = useMessage()
@@ -325,6 +326,7 @@ export default defineComponent({
       CloudDownloadOutline,
       ClipboardOutline,
       LanguageOutline,
+      CopyOutline,
       fileList,
       origData,
       tableName,
@@ -373,7 +375,7 @@ export default defineComponent({
         n.isPrimaryKey = !n.isPrimaryKey
         n.isChecked = false
       },
-      searchTableByName(){origData
+      searchTableByName(){
         //
         TableDesignAPI.tableDesignByTableName(queryParams.searchTableText).then(result=>{
           if(result.status == 200){
@@ -395,7 +397,16 @@ export default defineComponent({
         message.info("怎么做")
       },
       generateResults(){
-        translationResult.value = "h.select("+translationRequired.value+")"
+        // translationResult.value = "h.select("+translationRequired.value+")"
+        TableDesignAPI.tableDesignByTranslate(translationRequired.value).then(result=>{
+          debugger
+          if(result.data.code == 200){
+            translationResult.value = result.data.data
+          }else{
+            message.error(result.data.msg)
+          }
+
+        })
       },
       copyResult(){
         navigator.clipboard.writeText(translationResult.value).then(() => {
@@ -430,6 +441,10 @@ export default defineComponent({
         }
       }),
       copySqlRemark(){
+        if(tableName.value == null || typeof tableName.value == 'undefined' || tableName.value == ''){
+          message.warning('先写表名')
+          return false
+        }
         const resultSql = ref('')
         const temSql = ref('')
         editData.value.forEach(n=>{
@@ -437,6 +452,38 @@ export default defineComponent({
           resultSql.value += temSql.value + "\n" + "go" + "\n\n"
           temSql.value = ''
         })
+
+        navigator.clipboard.writeText(resultSql.value).then(() => {
+          message.success('文本已复制到剪贴板');
+        }).catch(err => {
+          message.error('复制失败: ' + err);
+        });
+      },
+      copySql(){
+        if(tableName.value == null || typeof tableName.value == 'undefined' || tableName.value == ''){
+          message.warning('先写表名')
+          return false
+        }
+        const resultSql = ref('create table ' + tableName.value + '(' + "\n")
+        const temSql = ref('')
+        editData.value.forEach((n,i)=>{
+          if(n.isPrimaryKey){
+            if(i == editData.value.length -1){
+              temSql.value +=  n.fieldName + "  " + n.fieldType + " " + "identity primary key" + "\n"
+            }else{
+              temSql.value +=  n.fieldName + "  " + n.fieldType + " " + "identity primary key," + "\n"
+            }
+          }else{
+            if(i == editData.value.length -1){
+              temSql.value +=  n.fieldName + "  " + n.fieldType  + "\n"
+            }else {
+              temSql.value +=  n.fieldName + "  " + n.fieldType + "," + "\n"
+            }
+          }
+
+        })
+        resultSql.value += temSql.value
+        resultSql.value = resultSql.value + "\n" +")"
 
         navigator.clipboard.writeText(resultSql.value).then(() => {
           message.success('文本已复制到剪贴板');
@@ -481,7 +528,7 @@ export default defineComponent({
           :data="needData"
           :bordered="false"
           :row-key="rowKey"
-          style="margin-top: 5px;"
+          style="margin-top: 5px;font-size: 12px"
           :style="{ height: `${windowHeight - 400}px` }"
           flex-height
           class="table-font-size"
@@ -509,6 +556,7 @@ export default defineComponent({
               placeholder="结果"
               @keydown.enter="copyResult"
               style="margin-left: 10px;margin-right: 15px"
+              readonly
           >
             <template #suffix>
               <NIcon :component="ClipboardOutline" @click="copyResult" style="cursor: pointer;" />
@@ -521,11 +569,17 @@ export default defineComponent({
       </n-divider>
       <div style=" margin-top: -15px; display: flex;">
         <NInput v-model:value="tableName" placeholder="表名" style="margin-left: 5px"/>
+        <n-button icon-placement="left" secondary strong style="margin-left: 5px" @click="copySql">
+          <template #icon>
+            <n-icon :component="CopyOutline"></n-icon>
+          </template>
+          {{ '建表' }}
+        </n-button>
         <n-button icon-placement="left" secondary strong style="margin-left: 5px" @click="copySqlRemark">
           <template #icon>
-            <n-icon :component="ClipboardOutline"></n-icon>
+            <n-icon :component="CopyOutline"></n-icon>
           </template>
-          {{ 'sql注解' }}
+          {{ '注解' }}
         </n-button>
 
       </div>
@@ -580,10 +634,10 @@ export default defineComponent({
           </thead>
           <tbody>
           <tr v-for="(n, i) in editData" :key="i" @dblclick="setPrimaryKeyDblClick(n)" >
-            <td><n-checkbox v-model:checked="n.isChecked" v-if="!n.isPrimaryKey"/>  <n-icon size="15" v-else><key-outline/></n-icon></td>
-            <td><n-mention v-model:value="n.fieldName" :options="nameOptions" :prefix="['_']" @search="nameHandleSearch"/></td>
-            <td><n-select v-model:value="n.fieldType" filterable tag :options="typeOptions" /></td>
-            <td><NInput v-model:value="n.remark" placeholder=""/></td>
+            <td><n-checkbox v-model:checked="n.isChecked" v-if="!n.isPrimaryKey" size="small"/>  <n-icon size="15" v-else ><key-outline/></n-icon></td>
+            <td><n-mention v-model:value="n.fieldName" :options="nameOptions" :prefix="['_']" @search="nameHandleSearch" size="small" /></td>
+            <td><n-select v-model:value="n.fieldType" filterable tag :options="typeOptions" size="small"/></td>
+            <td><NInput v-model:value="n.remark" placeholder="" size="small"/></td>
           </tr>
           </tbody>
         </NTable>
@@ -630,7 +684,7 @@ export default defineComponent({
           :data="origData"
           :bordered="false"
           :row-key="rowKey"
-          style="margin-top: 5px;"
+          style="margin-top: 5px;font-size: 12px"
           :style="{ height: `${windowHeight - 100}px` }"
           flex-height
           class="table-font-size"
@@ -643,9 +697,27 @@ export default defineComponent({
 
 <style scoped>
 
-.table-font-size{
-  font-size: 12px;
+
+
+
+::v-deep .n-mention input  {
+  font-size: 12px !important;
+  --n-font-size: 12px !important;
 }
+
+::v-deep .n-base-selection .n-base-selection-label .n-base-selection-input {
+  font-size: 12px !important;
+  --n-font-size: 12px !important;
+}
+
+.n-input__input-el{
+  font-size: 12px!important
+}
+
+.n-input, .n-input--resizable, .n-input--stateful{
+  font-size: 12px!important
+}
+
 
 .table-wrapper {
   max-height: 100%;

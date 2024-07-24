@@ -10,4 +10,9 @@ export class TableDesignAPI {
     }
 
 
+    static tableDesignByTranslate(fieldName: string) {
+        return httpRequest.get(`${this.BASIC_API_PREFIX}/translate/${fieldName}`)
+    }
+
+
 }
