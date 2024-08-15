@@ -110,26 +110,25 @@ export default defineComponent({
 </script>
 
 <template>
-  <div class='demo-app'>
+  <main class="flex h-[calc(100%-144px)] flex-col">
+    <div class='demo-app'>
 
-    <div class='demo-app-main'>
-      <n-tabs type="line" style="margin-top: -35px">
-        <n-tab :name="n.deptName" :tab="n.deptName" v-for="(n, i) in deptData">
-        </n-tab>
-      </n-tabs>
-      <FullCalendar
-          class='demo-app-calendar'
-          :options='calendarOptions'
-          :style="{ marginTop:'5px', height: '557px' }"
-      >
-        <template v-slot:eventContent='arg'>
-          <b>{{ arg.timeText }}</b>
-          <i>{{ arg.event.title }}</i>
-        </template>
-      </FullCalendar>
+      <div class='demo-app-main'>
+        <FullCalendar
+            class='demo-app-calendar'
+            :options='calendarOptions'
+            :style="{ marginTop:'5px', height: '557px' }"
+        >
+          <template v-slot:eventContent='arg'>
+            <b>{{ arg.timeText }}</b>
+            <i>{{ arg.event.title }}</i>
+          </template>
+        </FullCalendar>
+      </div>
+
     </div>
+  </main>
 
-  </div>
 </template>
 
 <style lang='css'>

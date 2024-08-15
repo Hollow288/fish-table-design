@@ -498,7 +498,7 @@ export default defineComponent({
 
 <template>
   <n-grid :x-gap="12" :cols="3" >
-    <n-grid-item>
+    <n-grid-item style="height: 100%">
       <n-divider title-placement="left" style="margin-top: 10px">
         也许你需要这些字段
       </n-divider>
@@ -528,8 +528,7 @@ export default defineComponent({
           :data="needData"
           :bordered="false"
           :row-key="rowKey"
-          style="margin-top: 5px;font-size: 12px"
-          :style="{ height: `${windowHeight - 400}px` }"
+          style="margin-top: 5px;font-size: 12px;min-height: 300px"
           flex-height
           class="table-font-size"
           @update:checked-row-keys="handleNeedCheck"
@@ -684,15 +683,13 @@ export default defineComponent({
           :data="origData"
           :bordered="false"
           :row-key="rowKey"
-          style="margin-top: 5px;font-size: 12px"
-          :style="{ height: `${windowHeight - 100}px` }"
-          flex-height
+          style="margin-top: 5px;font-size: 12px;height: calc(100% - 75px)"
           class="table-font-size"
+          flex-height
           @update:checked-row-keys="handleOrigCheck"
       />
     </n-grid-item>
   </n-grid>
-  <n-grid style="height: 26px;background-color: rgba(85, 85, 85, 0.4);"><n-grid-item><span style="color: red;"></span></n-grid-item></n-grid>
 </template>
 
 <style scoped>

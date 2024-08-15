@@ -6,7 +6,18 @@
       <NLoadingBarProvider>
         <NNotificationProvider>
           <NMessageProvider>
-            <RouterView>
+            <RouterView v-slot="{ Component }">
+              <template v-if="Component">
+                <Transition
+                    name="router"
+                    mode="out-in"
+                >
+                  <component
+                      :is="Component"
+                      class="text-base"
+                  />
+                </Transition>
+              </template>
             </RouterView>
           </NMessageProvider>
         </NNotificationProvider>
