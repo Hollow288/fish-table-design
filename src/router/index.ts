@@ -19,6 +19,11 @@ const routes: Array<RouteRecordRaw> = [
                 path: '/full-calendar-test',
                 name: 'full-calendar-test',
                 component: () => import('@/components/FullCalendarTest')  // 日历组件
+            },
+            {
+                path: '/vicons-ionicons5',
+                name: 'vicons-ionicons5',
+                component: () => import('@/components/ViconsIonicons5')  // 日历组件
             }
         ]
     },

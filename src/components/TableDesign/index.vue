@@ -74,7 +74,7 @@ const basicData = ref<field[]>([
 const basicNameData = ref(["ROW_GUID","TO_ROW_GUID","CREATION_DATE","CREATED_BY",
   "CREATED_BY_NAME","CREATED_BY_NUMBER","LAST_UPDATE_DATE","LAST_UPDATED_BY",
   "LAST_UPDATED_BY_NAME","LAST_UPDATED_BY_NUMBER","ENABLED_FLAG","ATTRIBUTE1",
-  "ATTRIBUTE2","ATTRIBUTE3","ATTRIBUTE4","DEPT_ID",
+  "ATTRIBUTE2","ATTRIBUTE3","ATTRIBUTE4","ATTRIBUTE5","DEPT_ID",
   "DEPT_CODE","DEPT_NAME"])
 
 const processData = ref<field[]>([
@@ -697,12 +697,12 @@ export default defineComponent({
 
 
 
-::v-deep .n-mention input  {
+:deep .n-mention input  {
   font-size: 12px !important;
   --n-font-size: 12px !important;
 }
 
-::v-deep .n-base-selection .n-base-selection-label .n-base-selection-input {
+:deep .n-base-selection .n-base-selection-label .n-base-selection-input {
   font-size: 12px !important;
   --n-font-size: 12px !important;
 }

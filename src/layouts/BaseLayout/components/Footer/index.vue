@@ -6,6 +6,8 @@ import {MenuOption, NButton, NIcon} from 'naive-ui'
 import tableDesign from "@/components/TableDesign/index.vue";
 import HomeOutline from '@vicons/ionicons5/HomeOutline'
 import CubeOutline from '@vicons/ionicons5/CubeOutline'
+import CalendarNumberOutline from '@vicons/ionicons5/CalendarNumberOutline'
+import LogoNodejs from '@vicons/ionicons5/LogoNodejs'
 
 import {
   BookOutline as BookIcon,
@@ -34,7 +36,7 @@ const menuOptions: MenuOption[] = [
             },
             { default: () => '首页' }
         ),
-    key: 'pinball-1973',
+    key: 'navigation',
     icon: renderIcon(HomeOutline),
   },
   {
@@ -63,7 +65,21 @@ const menuOptions: MenuOption[] = [
             { default: () => '日历' }
         ),
     key: 'full-calendar-test',
-    icon: renderIcon(CubeOutline)
+    icon: renderIcon(CalendarNumberOutline)
+  },
+  {
+    label: () =>
+        h(
+            RouterLink,
+            {
+              to: {
+                name: 'vicons-ionicons5'
+              }
+            },
+            { default: () => '图标' }
+        ),
+    key: 'vicons-ionicons5',
+    icon: renderIcon(LogoNodejs)
   },
 
 ]
