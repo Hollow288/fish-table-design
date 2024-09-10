@@ -71,11 +71,7 @@ const basicData = ref<field[]>([
   {fieldName: 'DEPT_NAME', fieldType: 'varchar(350)', remark: '申请部门name'}
 ])
 
-const basicNameData = ref(["ROW_GUID","TO_ROW_GUID","CREATION_DATE","CREATED_BY",
-  "CREATED_BY_NAME","CREATED_BY_NUMBER","LAST_UPDATE_DATE","LAST_UPDATED_BY",
-  "LAST_UPDATED_BY_NAME","LAST_UPDATED_BY_NUMBER","ENABLED_FLAG","ATTRIBUTE1",
-  "ATTRIBUTE2","ATTRIBUTE3","ATTRIBUTE4","ATTRIBUTE5","DEPT_ID",
-  "DEPT_CODE","DEPT_NAME"])
+const basicNameData = computed(() => basicData.value.map(item => item.fieldName));
 
 const processData = ref<field[]>([
   {fieldName: 'BOE_TYPE_CODE', fieldType: 'varchar(500)', remark: '单据类型-code'},
@@ -87,8 +83,7 @@ const processData = ref<field[]>([
 ])
 
 
-const processNameData = ref(["BOE_TYPE_CODE","BOE_TYPE_NAME","OPERATION_TYPE_CODE","OPERATION_TYPE_NAME",
-  "BOE_NUM","FLOW_STATUS"])
+const processNameData = computed(() => processData.value.map(item => item.fieldName));
 
 
 const submitLoading = ref(false)
