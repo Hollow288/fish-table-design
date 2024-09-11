@@ -371,7 +371,7 @@ export default defineComponent({
         n.isChecked = false
       },
       searchTableByName(){
-        //
+        // Todo: 数据库类型
         TableDesignAPI.tableDesignByTableName(queryParams.searchTableText).then(result=>{
           if(result.status == 200){
             if(result.data.length > 0){

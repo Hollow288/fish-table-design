@@ -31,19 +31,22 @@ dependencies:
     version: 4.17.21
   unplugin-auto-import:
     specifier: ^0.17.6
-    version: 0.17.6
+    version: 0.17.6(rollup@2.79.1)
   unplugin-vue-components:
     specifier: ^0.27.0
-    version: 0.27.0(vue@3.4.27)
+    version: 0.27.0(rollup@2.79.1)(vue@3.4.27)
   vite-plugin-vue-devtools:
     specifier: ^7.3.8
-    version: 7.3.8(vite@5.2.13)(vue@3.4.27)
+    version: 7.3.8(rollup@2.79.1)(vite@5.2.13)(vue@3.4.27)
   vue:
     specifier: ^3.4.21
     version: 3.4.27(typescript@5.4.5)
   vue-router:
     specifier: ^4.3.3
     version: 4.3.3(vue@3.4.27)
+  vue3-virtual-scroller:
+    specifier: ^0.2.3
+    version: 0.2.3(rollup@2.79.1)(vue@3.4.27)
 
 devDependencies:
   '@types/node':
@@ -763,7 +766,28 @@ packages:
     resolution: {integrity: sha512-j7P6Rgr3mmtdkeDGTe0E/aYyWEWVtc5yFXtHCRHs28/jptDEWfaVOc5T7cblqy1XKPPfCxJc/8DwQ5YgLOZOVQ==}
     dev: false
 
-  /@rollup/pluginutils@5.1.0:
+  /@rollup/plugin-json@4.1.0(rollup@2.79.1):
+    resolution: {integrity: sha512-yfLbTdNS6amI/2OpmbiBoW12vngr5NW2jCJVZSBEz+H5KfUJZ2M7sDjk0U6GOOdCWFVScShte29o9NezJ53TPw==}
+    peerDependencies:
+      rollup: ^1.20.0 || ^2.0.0
+    dependencies:
+      '@rollup/pluginutils': 3.1.0(rollup@2.79.1)
+      rollup: 2.79.1
+    dev: false
+
+  /@rollup/pluginutils@3.1.0(rollup@2.79.1):
+    resolution: {integrity: sha512-GksZ6pr6TpIjHm8h9lSQ8pi8BE9VeubNT0OMJ3B5uZJ8pz73NPiqOtCog/x2/QzM1ENChPKxMDhiQuRHsqc+lg==}
+    engines: {node: '>= 8.0.0'}
+    peerDependencies:
+      rollup: ^1.20.0||^2.0.0
+    dependencies:
+      '@types/estree': 0.0.39
+      estree-walker: 1.0.1
+      picomatch: 2.3.1
+      rollup: 2.79.1
+    dev: false
+
+  /@rollup/pluginutils@5.1.0(rollup@2.79.1):
     resolution: {integrity: sha512-XTIWOPPcpvyKI6L1NHo0lFlCyznUEyPmPY1mc3KpPVDYulHSTvyeLNVW00QTLIAFNhR3kYnJTQHeGqU4M3n09g==}
     engines: {node: '>=14.0.0'}
     peerDependencies:
@@ -775,6 +799,7 @@ packages:
       '@types/estree': 1.0.5
       estree-walker: 2.0.2
       picomatch: 2.3.1
+      rollup: 2.79.1
     dev: false
 
   /@rollup/rollup-android-arm-eabi@4.18.0:
@@ -897,6 +922,10 @@ packages:
     os: [win32]
     requiresBuild: true
     optional: true
+
+  /@types/estree@0.0.39:
+    resolution: {integrity: sha512-EYNwp3bU+98cpU4lAWYYL7Zz+2gryWH1qbdDTidVd6hkiR6weksdbMadyXKXNPEkQFhXM+hVO9ZygomHXp+AIw==}
+    dev: false
 
   /@types/estree@1.0.5:
     resolution: {integrity: sha512-/kYRxGDLWzHOB7q+wtSUQlFrtcdUccpfy+X+9iMBpHK8QLLhx2wIPYuS5DYtR9Wa/YlZAbIovy7qVdB1Aq6Lyw==}
@@ -1416,6 +1445,10 @@ packages:
     engines: {node: '>=12'}
     dev: false
 
+  /estree-walker@1.0.1:
+    resolution: {integrity: sha512-1fMXF3YP4pZZVozF8j/ZLfvnR8NSIljt56UhbZ5PeeDmmGHpgpdwQt7ITlGvYaQukCvuBRMLEiKiYC+oeIg4cg==}
+    dev: false
+
   /estree-walker@2.0.2:
     resolution: {integrity: sha512-Rfkk/Mp/DL7JVje3u18FxFujQlTNR2q6QfMSMB7AvCBx91NGj/ba3kCfza0f6dVDbw7YlRf/nDrn7pQrCCyQ/w==}
 
@@ -1908,6 +1941,14 @@ packages:
     resolution: {integrity: sha512-q1b3N5QkRUWUl7iyylaaj3kOpIT0N2i9MqIEQXP73GVsN9cw3fdx8X63cEmWhJGi2PPCF23Ijp7ktmd39rawIA==}
     dev: false
 
+  /rollup@2.79.1:
+    resolution: {integrity: sha512-uKxbd0IhMZOhjAiD5oAFp7BqvkA4Dv47qpOCtaNvng4HBwdbWtdOh8f5nZNuk2rp51PMGk3bzfWu5oayNEuYnw==}
+    engines: {node: '>=10.0.0'}
+    hasBin: true
+    optionalDependencies:
+      fsevents: 2.3.3
+    dev: false
+
   /rollup@4.18.0:
     resolution: {integrity: sha512-QmJz14PX3rzbJCN1SG4Xe/bAAX2a6NpCP8ab2vfu2GiUr8AQcr2nCV/oEO3yneFarB67zk8ShlIyWb2LGTb3Sg==}
     engines: {node: '>=18.0.0', npm: '>=8.0.0'}
@@ -1952,6 +1993,10 @@ packages:
       chokidar: 3.6.0
       immutable: 4.3.6
       source-map-js: 1.2.0
+
+  /scrollparent@2.1.0:
+    resolution: {integrity: sha512-bnnvJL28/Rtz/kz2+4wpBjHzWoEzXhVg/TE8BeVGJHUqE8THNIRnDxDWMktwM+qahvlRdvlLdsQfYe+cuqfZeA==}
+    dev: false
 
   /scule@1.3.0:
     resolution: {integrity: sha512-6FtHJEvt+pVMIB9IBY+IcCJ6Z5f1iQnytgyfKMhDKgmzYG+TeH/wx1y3l27rshSbLiSanrR9ffZDrEsmjlQF2g==}
@@ -2072,10 +2117,10 @@ packages:
   /undici-types@5.26.5:
     resolution: {integrity: sha512-JlCMO+ehdEIKqlFxk6IfVoAUVmgz7cU7zD/h9XZ0qzeosSHmUJVOzSQvvYSYWXkFXC+IfLKSIffhv0sVZup6pA==}
 
-  /unimport@3.7.2:
+  /unimport@3.7.2(rollup@2.79.1):
     resolution: {integrity: sha512-91mxcZTadgXyj3lFWmrGT8GyoRHWuE5fqPOjg5RVtF6vj+OfM5G6WCzXjuYtSgELE5ggB34RY4oiCSEP8I3AHw==}
     dependencies:
-      '@rollup/pluginutils': 5.1.0
+      '@rollup/pluginutils': 5.1.0(rollup@2.79.1)
       acorn: 8.11.3
       escape-string-regexp: 5.0.0
       estree-walker: 3.0.3
@@ -2097,7 +2142,7 @@ packages:
     engines: {node: '>= 10.0.0'}
     dev: false
 
-  /unplugin-auto-import@0.17.6:
+  /unplugin-auto-import@0.17.6(rollup@2.79.1):
     resolution: {integrity: sha512-dmX0Pex5DzMzVuALkexboOZvh51fL/BD6aoPO7qHoTYGlQp0GRKsREv2KMF1lzYI9SXKQiRxAjwzbQnrFFNydQ==}
     engines: {node: '>=14'}
     peerDependencies:
@@ -2110,18 +2155,18 @@ packages:
         optional: true
     dependencies:
       '@antfu/utils': 0.7.8
-      '@rollup/pluginutils': 5.1.0
+      '@rollup/pluginutils': 5.1.0(rollup@2.79.1)
       fast-glob: 3.3.2
       local-pkg: 0.5.0
       magic-string: 0.30.10
       minimatch: 9.0.4
-      unimport: 3.7.2
+      unimport: 3.7.2(rollup@2.79.1)
       unplugin: 1.10.1
     transitivePeerDependencies:
       - rollup
     dev: false
 
-  /unplugin-vue-components@0.27.0(vue@3.4.27):
+  /unplugin-vue-components@0.27.0(rollup@2.79.1)(vue@3.4.27):
     resolution: {integrity: sha512-77eTEy23sQ0UpzGWnZ9I2mY3cnmXwklz4ITcn3JfxjCoX643ghImkiZ4nFm58sxbdVcc4Fo/o4LIoFnlqEqsSg==}
     engines: {node: '>=14'}
     peerDependencies:
@@ -2135,7 +2180,7 @@ packages:
         optional: true
     dependencies:
       '@antfu/utils': 0.7.8
-      '@rollup/pluginutils': 5.1.0
+      '@rollup/pluginutils': 5.1.0(rollup@2.79.1)
       chokidar: 3.6.0
       debug: 4.3.5
       fast-glob: 3.3.2
@@ -2188,7 +2233,7 @@ packages:
       vite: 5.2.13(@types/node@20.14.8)(sass@1.77.5)
     dev: false
 
-  /vite-plugin-inspect@0.8.5(vite@5.2.13):
+  /vite-plugin-inspect@0.8.5(rollup@2.79.1)(vite@5.2.13):
     resolution: {integrity: sha512-JvTUqsP1JNDw0lMZ5Z/r5cSj81VK2B7884LO1DC3GMBhdcjcsAnJjdWq7bzQL01Xbh+v60d3lju3g+z7eAtNew==}
     engines: {node: '>=14'}
     peerDependencies:
@@ -2199,7 +2244,7 @@ packages:
         optional: true
     dependencies:
       '@antfu/utils': 0.7.10
-      '@rollup/pluginutils': 5.1.0
+      '@rollup/pluginutils': 5.1.0(rollup@2.79.1)
       debug: 4.3.5
       error-stack-parser-es: 0.1.5
       fs-extra: 11.2.0
@@ -2213,7 +2258,7 @@ packages:
       - supports-color
     dev: false
 
-  /vite-plugin-vue-devtools@7.3.8(vite@5.2.13)(vue@3.4.27):
+  /vite-plugin-vue-devtools@7.3.8(rollup@2.79.1)(vite@5.2.13)(vue@3.4.27):
     resolution: {integrity: sha512-b5t4wxCb5g5cjh+odNpgnB7iX7gA6FJnKugFqX2/YZX9I4fvMjlj1bUnCKnvPlmwnFxClYgdmgZcCh2RyhZgvw==}
     engines: {node: '>=v14.21.3'}
     peerDependencies:
@@ -2225,7 +2270,7 @@ packages:
       execa: 8.0.1
       sirv: 2.0.4
       vite: 5.2.13(@types/node@20.14.8)(sass@1.77.5)
-      vite-plugin-inspect: 0.8.5(vite@5.2.13)
+      vite-plugin-inspect: 0.8.5(rollup@2.79.1)(vite@5.2.13)
       vite-plugin-vue-inspector: 5.1.3(vite@5.2.13)
     transitivePeerDependencies:
       - '@nuxt/kit'
@@ -2329,6 +2374,36 @@ packages:
       semver: 7.6.2
       typescript: 5.4.5
     dev: true
+
+  /vue3-observe-visibility2@0.0.3(vue@3.4.27):
+    resolution: {integrity: sha512-yJL0G5RrI/uXdDrs+0fdlk/dYKhKBRZtkwJO0ar44NTIX+Rnw63iHgTz+p00M+yp6Avm1Q+o6y82h0hkTzmpHg==}
+    peerDependencies:
+      vue: ^3.0.0
+    dependencies:
+      vue: 3.4.27(typescript@5.4.5)
+    dev: false
+
+  /vue3-resize@0.2.0(vue@3.4.27):
+    resolution: {integrity: sha512-vZkbEv4PjMEWFV0igAxCvdSIH9hrIJjXyJ9XPTxH0cS/L2/VW1dLVORMWJKU0VXHpHiYKwskB62ju7aBQMVpOQ==}
+    peerDependencies:
+      vue: ^3.0.0
+    dependencies:
+      vue: 3.4.27(typescript@5.4.5)
+    dev: false
+
+  /vue3-virtual-scroller@0.2.3(rollup@2.79.1)(vue@3.4.27):
+    resolution: {integrity: sha512-iPBi0FocZGxVar46iLYzLMfdTMe/O3X8h1iTc21aPhAaGRyMMAZ64AN7Dn6FA+qYFam5f3wHIUktAnpgCFtNuw==}
+    peerDependencies:
+      vue: ^3.0.0
+    dependencies:
+      '@rollup/plugin-json': 4.1.0(rollup@2.79.1)
+      scrollparent: 2.1.0
+      vue: 3.4.27(typescript@5.4.5)
+      vue3-observe-visibility2: 0.0.3(vue@3.4.27)
+      vue3-resize: 0.2.0(vue@3.4.27)
+    transitivePeerDependencies:
+      - rollup
+    dev: false
 
   /vue@3.4.27(typescript@5.4.5):
     resolution: {integrity: sha512-8s/56uK6r01r1icG/aEOHqyMVxd1bkYcSe9j8HcKtr/xTOFWvnzIVTehNW+5Yt89f+DLBe4A569pnZLS5HzAMA==}
