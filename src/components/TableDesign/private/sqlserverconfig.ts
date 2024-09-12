@@ -70,12 +70,41 @@ export const typeOptions = [
 ]
 
 
-export const copySql = ()=>{
+export const copySql = (editData,tableName):string=>{
+    const resultSql = ref('create table ' + tableName.value + '(' + "\n")
+    const temSql = ref('')
+    editData.value.forEach((n,i)=>{
+        if(n.isPrimaryKey){
+            if(i == editData.value.length -1){
+                temSql.value +=  n.fieldName + "  " + n.fieldType + " " + "identity primary key" + "\n"
+            }else{
+                temSql.value +=  n.fieldName + "  " + n.fieldType + " " + "identity primary key," + "\n"
+            }
+        }else{
+            if(i == editData.value.length -1){
+                temSql.value +=  n.fieldName + "  " + n.fieldType  + "\n"
+            }else {
+                temSql.value +=  n.fieldName + "  " + n.fieldType + "," + "\n"
+            }
+        }
 
+    })
+    resultSql.value += temSql.value
+    resultSql.value = resultSql.value + "\n" +")"
+
+    return resultSql.value
 }
 
-export const copySqlRemark = ()=>{
+export const copySqlRemark = (editData,tableName):string=>{
+    const resultSql = ref('')
+    const temSql = ref('')
+    editData.value.forEach(n=>{
+        temSql.value += "exec sp_addextendedproperty 'MS_Description', N'" + n.remark + "', 'SCHEMA', 'dbo', 'TABLE', '" + tableName.value + "', 'COLUMN','" + n.fieldName + "'"
+        resultSql.value += temSql.value + "\n" + "go" + "\n\n"
+        temSql.value = ''
+    })
 
+    return resultSql.value
 }
 
 

@@ -13,6 +13,7 @@ import LanguageOutline from '@vicons/ionicons5/LanguageOutline'
 import CopyOutline from '@vicons/ionicons5/CopyOutline'
 import {cloneDeep} from 'lodash-es'
 import {TableDesignAPI} from "@/api/tableDesign";
+import {basicData,processData,typeOptions,copySql,copySqlRemark,dataBase} from './private'
 
 type field = {
   fieldName: string
@@ -49,38 +50,38 @@ const queryParams = reactive({
   searchFieldText: ''
 })
 
-const basicData = ref<field[]>([
-  {fieldName: 'ROW_GUID', fieldType: 'varchar(64)', remark: 'uid'},
-  {fieldName: 'TO_ROW_GUID', fieldType: 'varchar(64)', remark: '主表uid'},
-  {fieldName: 'CREATION_DATE', fieldType: 'datetime', remark: '申请日期'},
-  {fieldName: 'CREATED_BY', fieldType: 'int', remark: '申请人id'},
-  {fieldName: 'CREATED_BY_NAME', fieldType: 'varchar(50)', remark: '申请人name'},
-  {fieldName: 'CREATED_BY_NUMBER', fieldType: 'varchar(50)', remark: '申请人code'},
-  {fieldName: 'LAST_UPDATE_DATE', fieldType: 'datetime', remark: '最近更新时间'},
-  {fieldName: 'LAST_UPDATED_BY', fieldType: 'int', remark: '最近更新人id'},
-  {fieldName: 'LAST_UPDATED_BY_NAME', fieldType: 'varchar(50)', remark: '最近更新人'},
-  {fieldName: 'LAST_UPDATED_BY_NUMBER', fieldType: 'varchar(50)', remark: '最近更新人code'},
-  {fieldName: 'ENABLED_FLAG', fieldType: 'varchar(10)', remark: '是否逻辑删除'},
-  {fieldName: 'ATTRIBUTE1', fieldType: 'varchar(500)', remark: '备用字段'},
-  {fieldName: 'ATTRIBUTE2', fieldType: 'varchar(500)', remark: '备用字段'},
-  {fieldName: 'ATTRIBUTE3', fieldType: 'varchar(500)', remark: '备用字段'},
-  {fieldName: 'ATTRIBUTE4', fieldType: 'varchar(500)', remark: '备用字段'},
-  {fieldName: 'ATTRIBUTE5', fieldType: 'varchar(500)', remark: '备用字段'},
-  {fieldName: 'DEPT_ID', fieldType: 'int', remark: '申请部门id'},
-  {fieldName: 'DEPT_CODE', fieldType: 'varchar(150)', remark: '申请部门code'},
-  {fieldName: 'DEPT_NAME', fieldType: 'varchar(350)', remark: '申请部门name'}
-])
+// const basicData = ref<field[]>([
+//   {fieldName: 'ROW_GUID', fieldType: 'varchar(64)', remark: 'uid'},
+//   {fieldName: 'TO_ROW_GUID', fieldType: 'varchar(64)', remark: '主表uid'},
+//   {fieldName: 'CREATION_DATE', fieldType: 'datetime', remark: '申请日期'},
+//   {fieldName: 'CREATED_BY', fieldType: 'int', remark: '申请人id'},
+//   {fieldName: 'CREATED_BY_NAME', fieldType: 'varchar(50)', remark: '申请人name'},
+//   {fieldName: 'CREATED_BY_NUMBER', fieldType: 'varchar(50)', remark: '申请人code'},
+//   {fieldName: 'LAST_UPDATE_DATE', fieldType: 'datetime', remark: '最近更新时间'},
+//   {fieldName: 'LAST_UPDATED_BY', fieldType: 'int', remark: '最近更新人id'},
+//   {fieldName: 'LAST_UPDATED_BY_NAME', fieldType: 'varchar(50)', remark: '最近更新人'},
+//   {fieldName: 'LAST_UPDATED_BY_NUMBER', fieldType: 'varchar(50)', remark: '最近更新人code'},
+//   {fieldName: 'ENABLED_FLAG', fieldType: 'varchar(10)', remark: '是否逻辑删除'},
+//   {fieldName: 'ATTRIBUTE1', fieldType: 'varchar(500)', remark: '备用字段'},
+//   {fieldName: 'ATTRIBUTE2', fieldType: 'varchar(500)', remark: '备用字段'},
+//   {fieldName: 'ATTRIBUTE3', fieldType: 'varchar(500)', remark: '备用字段'},
+//   {fieldName: 'ATTRIBUTE4', fieldType: 'varchar(500)', remark: '备用字段'},
+//   {fieldName: 'ATTRIBUTE5', fieldType: 'varchar(500)', remark: '备用字段'},
+//   {fieldName: 'DEPT_ID', fieldType: 'int', remark: '申请部门id'},
+//   {fieldName: 'DEPT_CODE', fieldType: 'varchar(150)', remark: '申请部门code'},
+//   {fieldName: 'DEPT_NAME', fieldType: 'varchar(350)', remark: '申请部门name'}
+// ])
 
 const basicNameData = computed(() => basicData.value.map(item => item.fieldName));
 
-const processData = ref<field[]>([
-  {fieldName: 'BOE_TYPE_CODE', fieldType: 'varchar(500)', remark: '单据类型-code'},
-  {fieldName: 'BOE_TYPE_NAME', fieldType: 'varchar(500)', remark: '单据类型-name'},
-  {fieldName: 'OPERATION_TYPE_CODE', fieldType: 'varchar(100)', remark: '业务类型-code'},
-  {fieldName: 'OPERATION_TYPE_NAME', fieldType: 'varchar(100)', remark: '业务类型-name'},
-  {fieldName: 'BOE_NUM', fieldType: 'varchar(50)', remark: '单据编号'},
-  {fieldName: 'FLOW_STATUS', fieldType: 'varchar(228)', remark: '流程状态'}
-])
+// const processData = ref<field[]>([
+//   {fieldName: 'BOE_TYPE_CODE', fieldType: 'varchar(500)', remark: '单据类型-code'},
+//   {fieldName: 'BOE_TYPE_NAME', fieldType: 'varchar(500)', remark: '单据类型-name'},
+//   {fieldName: 'OPERATION_TYPE_CODE', fieldType: 'varchar(100)', remark: '业务类型-code'},
+//   {fieldName: 'OPERATION_TYPE_NAME', fieldType: 'varchar(100)', remark: '业务类型-name'},
+//   {fieldName: 'BOE_NUM', fieldType: 'varchar(50)', remark: '单据编号'},
+//   {fieldName: 'FLOW_STATUS', fieldType: 'varchar(228)', remark: '流程状态'}
+// ])
 
 
 const processNameData = computed(() => processData.value.map(item => item.fieldName));
@@ -162,40 +163,40 @@ export default defineComponent({
     ]
 
 
-    const typeOptions = [
-      {
-        label: 'int',
-        value: 'int'
-      },
-      {
-        label: 'numeric(18, 2)',
-        value: 'numeric(18, 2)'
-      },
-      {
-        label: 'numeric(18, 6)',
-        value: 'numeric(18, 6)'
-      },
-      {
-        label: 'datetime',
-        value: 'datetime'
-      },
-      {
-        label: 'varchar(100)',
-        value: 'varchar(100)'
-      },
-      {
-        label: 'varchar(200)',
-        value: 'varchar(200)'
-      },
-      {
-        label: 'varchar(500)',
-        value: 'varchar(500)'
-      },
-      {
-        label: 'varchar(3000)',
-        value: 'varchar(3000)'
-      },
-    ]
+    // const typeOptions = [
+    //   {
+    //     label: 'int',
+    //     value: 'int'
+    //   },
+    //   {
+    //     label: 'numeric(18, 2)',
+    //     value: 'numeric(18, 2)'
+    //   },
+    //   {
+    //     label: 'numeric(18, 6)',
+    //     value: 'numeric(18, 6)'
+    //   },
+    //   {
+    //     label: 'datetime',
+    //     value: 'datetime'
+    //   },
+    //   {
+    //     label: 'varchar(100)',
+    //     value: 'varchar(100)'
+    //   },
+    //   {
+    //     label: 'varchar(200)',
+    //     value: 'varchar(200)'
+    //   },
+    //   {
+    //     label: 'varchar(500)',
+    //     value: 'varchar(500)'
+    //   },
+    //   {
+    //     label: 'varchar(3000)',
+    //     value: 'varchar(3000)'
+    //   },
+    // ]
 
     const editColumns = (): DataTableColumns<field> => [
       {
@@ -372,7 +373,7 @@ export default defineComponent({
       },
       searchTableByName(){
         // Todo: 数据库类型
-        TableDesignAPI.tableDesignByTableName(queryParams.searchTableText).then(result=>{
+        TableDesignAPI.tableDesignByTableName(queryParams.searchTableText,dataBase).then(result=>{
           if(result.status == 200){
             if(result.data.length > 0){
               origData.value = result.data
@@ -440,15 +441,8 @@ export default defineComponent({
           message.warning('先写表名')
           return false
         }
-        const resultSql = ref('')
-        const temSql = ref('')
-        editData.value.forEach(n=>{
-          temSql.value += "exec sp_addextendedproperty 'MS_Description', N'" + n.remark + "', 'SCHEMA', 'dbo', 'TABLE', '" + tableName.value + "', 'COLUMN','" + n.fieldName + "'"
-          resultSql.value += temSql.value + "\n" + "go" + "\n\n"
-          temSql.value = ''
-        })
 
-        navigator.clipboard.writeText(resultSql.value).then(() => {
+        navigator.clipboard.writeText(copySqlRemark(editData,tableName)).then(() => {
           message.success('文本已复制到剪贴板');
         }).catch(err => {
           message.error('复制失败: ' + err);
@@ -459,28 +453,8 @@ export default defineComponent({
           message.warning('先写表名')
           return false
         }
-        const resultSql = ref('create table ' + tableName.value + '(' + "\n")
-        const temSql = ref('')
-        editData.value.forEach((n,i)=>{
-          if(n.isPrimaryKey){
-            if(i == editData.value.length -1){
-              temSql.value +=  n.fieldName + "  " + n.fieldType + " " + "identity primary key" + "\n"
-            }else{
-              temSql.value +=  n.fieldName + "  " + n.fieldType + " " + "identity primary key," + "\n"
-            }
-          }else{
-            if(i == editData.value.length -1){
-              temSql.value +=  n.fieldName + "  " + n.fieldType  + "\n"
-            }else {
-              temSql.value +=  n.fieldName + "  " + n.fieldType + "," + "\n"
-            }
-          }
 
-        })
-        resultSql.value += temSql.value
-        resultSql.value = resultSql.value + "\n" +")"
-
-        navigator.clipboard.writeText(resultSql.value).then(() => {
+        navigator.clipboard.writeText(copySql(editData,tableName)).then(() => {
           message.success('文本已复制到剪贴板');
         }).catch(err => {
           message.error('复制失败: ' + err);
@@ -562,7 +536,7 @@ export default defineComponent({
         其他辅助
       </n-divider>
       <div style=" margin-top: -15px; display: flex;">
-        <NInput v-model:value="tableName" placeholder="表名" style="margin-left: 5px"/>
+        <NInput v-model:value="tableName" placeholder="表名" style="margin-left: 5px" clearable/>
         <n-button icon-placement="left" secondary strong style="margin-left: 5px" @click="copySql">
           <template #icon>
             <n-icon :component="CopyOutline"></n-icon>

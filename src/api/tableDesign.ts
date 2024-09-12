@@ -5,8 +5,8 @@ export class TableDesignAPI {
     private static headers = { 'Content-Type': 'multipart/form-data' }
 
 
-    static tableDesignByTableName(tableName: string) {
-        return httpRequest.get(`${this.BASIC_API_PREFIX}/${tableName}`)
+    static tableDesignByTableName(tableName: string,dataBase: string) {
+        return httpRequest.get(`${this.BASIC_API_PREFIX}/${tableName}/${dataBase}`)
     }
 
 
