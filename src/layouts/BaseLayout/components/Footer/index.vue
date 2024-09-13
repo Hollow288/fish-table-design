@@ -8,6 +8,7 @@ import HomeOutline from '@vicons/ionicons5/HomeOutline'
 import CubeOutline from '@vicons/ionicons5/CubeOutline'
 import CalendarNumberOutline from '@vicons/ionicons5/CalendarNumberOutline'
 import LogoNodejs from '@vicons/ionicons5/LogoNodejs'
+import LogoVue from '@vicons/ionicons5/LogoVue'
 
 import {
   BookOutline as BookIcon,
@@ -80,6 +81,20 @@ const menuOptions: MenuOption[] = [
         ),
     key: 'vicons-ionicons5',
     icon: renderIcon(LogoNodejs)
+  },
+  {
+    label: () =>
+        h(
+            RouterLink,
+            {
+              to: {
+                name: 'Naive'
+              }
+            },
+            { default: () => 'Naive UI' }
+        ),
+    key: 'Naive',
+    icon: renderIcon(LogoVue)
   },
 
 ]

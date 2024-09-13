@@ -23,7 +23,12 @@ const routes: Array<RouteRecordRaw> = [
             {
                 path: '/vicons-ionicons5',
                 name: 'vicons-ionicons5',
-                component: () => import('@/components/ViconsIonicons5')  // 日历组件
+                component: () => import('@/components/ViconsIonicons5')  // 图标
+            },
+            {
+                path: '/Naive',
+                name: 'Naive',
+                component: () => import('@/components/Naive')  // Naive
             }
         ]
     },

@@ -590,8 +590,8 @@ export default defineComponent({
           {{ '删除' }}
         </n-button>
       </div>
-      <div class="table-wrapper" :style="{ maxHeight: `${windowHeight - 100}px` }">
-        <NTable class="custom-table" size="small" style="margin-top: 5px">
+      <div class="table-wrapper" :style="{ maxHeight: `${windowHeight - 105}px`,marginTop : '5px' }">
+        <NTable class="custom-table" size="small" >
           <thead>
           <tr  >
             <th><n-checkbox @change="checkEditDetail"/></th>
@@ -692,6 +692,7 @@ export default defineComponent({
 
 .custom-table {
   width: 100%;
+  overflow-y: auto;
   border-collapse: collapse;
 }
 
@@ -699,14 +700,7 @@ export default defineComponent({
   position: sticky;
   top: 0;
   background-color: #fff;
-  z-index: 1;
-}
-
-.custom-table thead th {
-  position: sticky;
-  top: 0;
-  background-color: #fff;
-  z-index: 1;
+  z-index: 50;
 }
 
 /* 设置滚动条的宽度和颜色 */
