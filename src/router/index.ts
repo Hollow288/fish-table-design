@@ -29,6 +29,11 @@ const routes: Array<RouteRecordRaw> = [
                 path: '/Naive',
                 name: 'Naive',
                 component: () => import('@/components/Naive')  // Naive
+            },
+            {
+                path: '/WebSocket',
+                name: 'WebSocket',
+                component: () => import('@/components/WebSocket')  // Naive
             }
         ]
     },

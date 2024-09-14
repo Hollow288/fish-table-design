@@ -35,5 +35,6 @@ declare module 'vue' {
     RouterView: typeof import('vue-router')['RouterView']
     TableDesign: typeof import('./../src/components/TableDesign/index.vue')['default']
     ViconsIonicons5: typeof import('./../src/components/ViconsIonicons5/index.vue')['default']
+    WebSocket: typeof import('./../src/components/WebSocket/index.vue')['default']
   }
 }
