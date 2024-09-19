@@ -30,6 +30,7 @@ declare module 'vue' {
     NMessageProvider: typeof import('naive-ui')['NMessageProvider']
     NNotificationProvider: typeof import('naive-ui')['NNotificationProvider']
     NSelect: typeof import('naive-ui')['NSelect']
+    NSpan: typeof import('naive-ui')['NSpan']
     NSpin: typeof import('naive-ui')['NSpin']
     NSplit: typeof import('naive-ui')['NSplit']
     NTable: typeof import('naive-ui')['NTable']

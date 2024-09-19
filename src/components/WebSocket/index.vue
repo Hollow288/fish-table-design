@@ -10,63 +10,134 @@ export default defineComponent({
     components: {ReloadOutline},
     setup() {
 
-        onMounted(() => {
-            message.info("点了？")
-            // Todo
-        });
+        type User = {
+            userId: string
+        }
+
+        let socket: WebSocket;
+        const userId = ref(localStorage.getItem("ms_uuid"))
+        const content = ref('')
 
         const message = useMessage()
 
         const loading = ref(false)
         const onlinePeopleLoading = ref(false)
 
-        const avatars = [
-            'https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg',
-            'https://avatars.githubusercontent.com/u/20943608?s=60&v=4',
-            'https://avatars.githubusercontent.com/u/46394163?s=60&v=4',
-            'https://avatars.githubusercontent.com/u/39197136?s=60&v=4',
-            'https://avatars.githubusercontent.com/u/19239641?s=60&v=4'
-        ]
-
-        const messages = ['星期一星期一星期一星期一星期一星期一星期一星期一星期一星期一星期一星期一星期一星期一星期一星期一星期一星期一星期一星期一星期一星期一星期一星期一星期一星期一星期一星期一星期一星期一星期一星期一星期一星期一星期一星期一星期一星期一星期一星期一星期一星期一星期一星期一星期一', '星期二', '星期三', '星期四', '星期五']
-
-        const mock = (i: number) => ({
-            key: `${i}`,
-            value: i,
-            avatar: avatars[i % avatars.length],
-            message: messages[Math.floor(Math.random() * messages.length)]
-        })
-
-        const items = ref(Array.from({length: 100}, (_, i) => mock(i)))
-        const noMore = computed(() => items.value.length > 16)
-
-        const handleLoad = async () => {
-            if (loading.value || noMore.value)
-                return
-            loading.value = true
-            await new Promise(resolve => setTimeout(resolve, 1000))
-            items.value.push(
-                ...[mock(items.value.length), mock(items.value.length + 1)]
-            )
-            loading.value = false
+        const generateUUID = () => {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+                const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
         }
 
+        const avatars = 'https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg'
+
+
+        const messageList = ref([])
+        const userList = ref<string[]>([]);
+
+
+        const openSocket = () => {
+            if (typeof WebSocket == "undefined") {
+                console.log("您的浏览器不支持WebSocket");
+            } else {
+                console.log("您的浏览器支持WebSocket");
+                //实现化WebSocket对象，指定要连接的服务器地址与端口  建立连接
+                //等同于socket = new WebSocket("ws://localhost:8888/xxxx/im/25");
+                //var socketUrl="${request.contextPath}/im/"+$("#userId").val();
+                var socketUrl =
+                    "http://localhost:8999/fish-table-design-api/imserver/" + userId.value;
+                socketUrl = socketUrl.replace("https", "ws").replace("http", "ws");
+                console.log(socketUrl);
+                debugger
+                if (socket !== null && socket instanceof WebSocket) {
+                    socket.close()
+                    socket = null
+                }
+                socket = new WebSocket(socketUrl);
+                //打开事件
+                // socket.value = new WebSocket(socketUrl);
+                //打开事件
+                socket.onopen = function () {
+                    console.log("websocket已打开");
+                    //socket.send("这是来自客户端的消息" + location.href + new Date());
+                };
+                //获得消息事件
+                socket.onmessage = function (msg) {
+                    // console.log(msg.data);
+                    let rtn = JSON.parse(msg.data)
+                    if (rtn.messageType == 'message') {
+                        messageList.value.push(JSON.parse(msg.data))
+                    }
+                    if (rtn.messageType == 'userList') {
+                        userList.value = JSON.parse(JSON.parse(msg.data).content)
+
+                    }
+
+                    //发现消息进入    开始处理前端触发逻辑
+                };
+                //关闭事件
+                socket.onclose = function () {
+                    console.log("websocket已关闭");
+                };
+                //发生了错误事件
+                socket.onerror = function () {
+                    console.log("websocket发生了错误");
+                };
+            }
+        }
+
+
         return {
+            WebSocket,
+            socket,
+            userId,
+            avatars,
+            content,
             onlinePeopleLoading,
-            items,
-            noMore,
+            messageList,
+            userList,
             loading,
-            handleLoad,
             PaperPlaneOutline,
             ReloadOutline,
             flushedOnlinePeople() {
-
-                onlinePeopleLoading.value = true
-                setTimeout(() => {
+                try {
+                    onlinePeopleLoading.value = true
+                    let parms = {messageType: "userList"}
+                    socket.send(JSON.stringify(parms));
+                } catch (e) {
+                    message.error("出错了...")
                     onlinePeopleLoading.value = false
-                }, 5000) // 5秒后执行
+                } finally {
+                    onlinePeopleLoading.value = false
+                }
+
+            },
+            openSocket,
+            sendMessage() {
+                if (typeof WebSocket == "undefined") {
+                    console.log("您的浏览器不支持WebSocket");
+                } else {
+                    console.log("您的浏览器支持WebSocket");
+                    let parms = {content: content.value, messageType: "message"}
+                    socket.send(JSON.stringify(parms));
+                    content.value = ''
+                }
+            },
+            joinContact() {
+                if (typeof localStorage.getItem("ms_uuid") == 'undefined' || localStorage.getItem("ms_uuid") == null || localStorage.getItem("ms_uuid") == '') {
+                    let temVal = generateUUID()
+                    localStorage.setItem("ms_uuid", temVal)
+                    userId.value = temVal
+                }
+                openSocket()
+            },
+            cleanMessage() {
+                messageList.value = []
             }
         }
+
+
     }
 
 
@@ -93,9 +164,9 @@ export default defineComponent({
                 </n-divider>
                 <n-spin :show="onlinePeopleLoading">
                     <ul>
-                        <li v-for="(user, index) in items" :key="user.id">
-                            <img class="avatar" :src="user.avatar" alt="">
-                            <span>{{ '赫赫' }}</span>
+                        <li v-for="user in userList" :key="user">
+                            <img class="avatar" :src="avatars" alt="">
+                            <span>{{ user }}</span>
                         </li>
                     </ul>
                 </n-spin>
@@ -108,25 +179,35 @@ export default defineComponent({
             <!-- 固定在顶部的公共聊天室标题 -->
             <div class="header">
                 公共聊天室
+                <div class="float-right">
+                    <n-gradient-text type="success" class="float-right"
+                                     v-if="typeof socket != 'undefined' && socket != null ">
+                        正在聊天
+                    </n-gradient-text>
+                    <n-gradient-text type="info" style="cursor: pointer" @click="joinContact" v-else>
+                        加入聊天
+                    </n-gradient-text>
+                </div>
+
             </div>
 
             <!-- 聊天内容区域 -->
             <div class="chat-box">
                 <div
-                        v-for="(item, index) in items"
-                        :key="item.key"
+                        v-for="item in messageList"
+                        :key="item.userId"
                         class="message"
-                        :class="{ reverse: index % 5 === 0 }"
+                        :class="{ reverse: item.userId  === userId }"
                 >
-                    <img class="avatar" :src="item.avatar" alt="">
+                    <img class="avatar" :src="avatars" alt="">
 
                     <div class="message-content">
                         <!-- 显示名字 -->
-                        <div class="name">赫赫</div>
+                        <div class="name">{{ item.userId }}</div>
 
                         <!-- 包裹消息的白色卡片 -->
                         <div class="message-bubble">
-                            <span>{{ item.message }} {{ index % 5 === 0 ? '?' : '' }}</span>
+                            <span>{{ item.content }}</span>
                         </div>
                     </div>
                 </div>
@@ -134,7 +215,7 @@ export default defineComponent({
                 <div v-if="loading" class="text">
                     加载中...
                 </div>
-                <div v-if="noMore" class="text">
+                <div class="text">
                     没有更多了 🤪
                 </div>
             </div>
@@ -142,15 +223,16 @@ export default defineComponent({
             <!-- 固定在底部的 footer -->
             <div class="footer">
                 <!-- 你可以在这里放一些内容，比如输入框，按钮等 -->
-                <NInput type="textarea" placeholder="输入消息..." :autosize="{minRows: 3}"></NInput>
+                <NInput type="textarea" placeholder="输入消息..." :autosize="{minRows: 3}"
+                        v-model:value="content"></NInput>
                 <div class="button-container">
-                    <n-button>
+                    <n-button @click="sendMessage">
                         <template #icon>
                             <n-icon :component="PaperPlaneOutline"></n-icon>
                         </template>
                         {{ '发送' }}
                     </n-button>
-                    <n-button>
+                    <n-button @click="cleanMessage">
                         <template #icon>
                             <n-icon :component="ReloadOutline"></n-icon>
                         </template>
@@ -217,9 +299,13 @@ export default defineComponent({
     text-align: center;
     font-weight: bold;
     border-bottom: 1px solid #ccc;
-    position: sticky;
+    position: relative;
     top: 0;
     z-index: 1;
+}
+
+.float-right {
+    float: right;
 }
 
 /* 聊天内容区域 */
