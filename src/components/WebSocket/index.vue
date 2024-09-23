@@ -23,6 +23,8 @@ export default defineComponent({
         const loading = ref(false)
         const onlinePeopleLoading = ref(false)
 
+        const webSocketOpen = ref(false)
+
         const generateUUID = () => {
             return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
                 const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
@@ -61,6 +63,7 @@ export default defineComponent({
                 socket.onopen = function () {
                     console.log("websocket已打开");
                     //socket.send("这是来自客户端的消息" + location.href + new Date());
+                    webSocketOpen.value = true
                 };
                 //获得消息事件
                 socket.onmessage = function (msg) {
@@ -79,16 +82,19 @@ export default defineComponent({
                 //关闭事件
                 socket.onclose = function () {
                     console.log("websocket已关闭");
+                    webSocketOpen.value = false
                 };
                 //发生了错误事件
                 socket.onerror = function () {
                     console.log("websocket发生了错误");
+                    webSocketOpen.value = false
                 };
             }
         }
 
 
         return {
+            webSocketOpen,
             WebSocket,
             socket,
             userId,
@@ -131,6 +137,7 @@ export default defineComponent({
                     userId.value = temVal
                 }
                 openSocket()
+                message.info("加入成功...")
             },
             cleanMessage() {
                 messageList.value = []
@@ -150,8 +157,8 @@ export default defineComponent({
         <!-- 左侧在线用户列表 -->
         <div class="left-panel">
             <div class="online-users">
-                <n-divider class="sticky-divider">
-                    在线用户
+                <n-divider class="sticky-divider" >
+                    <h5>在线用户({{userList.length}})</h5>
                     <!--                    <n-icon :component="ReloadOutline" @click="flushedOnlinePeople" style="cursor: pointer"></n-icon>-->
                     <n-float-button position="relative" height="25" width="25" @click="flushedOnlinePeople"
                                     style="margin: -3px 0 0 5px">
@@ -181,7 +188,7 @@ export default defineComponent({
                 公共聊天室
                 <div class="float-right">
                     <n-gradient-text type="success" class="float-right"
-                                     v-if="typeof socket != 'undefined' && socket != null ">
+                                     v-if="webSocketOpen">
                         正在聊天
                     </n-gradient-text>
                     <n-gradient-text type="info" style="cursor: pointer" @click="joinContact" v-else>
@@ -430,7 +437,6 @@ export default defineComponent({
 }
 
 .reverse .message-bubble {
-    background-color: #f0f0f0;
     text-align: right;
 }
 
