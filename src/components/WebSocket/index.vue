@@ -38,6 +38,20 @@ export default defineComponent({
         const messageList = ref([])
         const userList = ref<string[]>([]);
 
+        const flushedOnlinePeople = ()=> {
+            try {
+                onlinePeopleLoading.value = true
+                let parms = {messageType: "userList"}
+                socket.send(JSON.stringify(parms));
+            } catch (e) {
+                message.error("出错了...")
+                onlinePeopleLoading.value = false
+            } finally {
+                onlinePeopleLoading.value = false
+            }
+
+        }
+
 
         const openSocket = () => {
             if (typeof WebSocket == "undefined") {
@@ -47,11 +61,8 @@ export default defineComponent({
                 //实现化WebSocket对象，指定要连接的服务器地址与端口  建立连接
                 //等同于socket = new WebSocket("ws://localhost:8888/xxxx/im/25");
                 //var socketUrl="${request.contextPath}/im/"+$("#userId").val();
-                var socketUrl =
-                    "http://localhost:8999/fish-table-design-api/imserver/" + userId.value;
+                let socketUrl = `http://localhost:8999/fish-table-design-api/imserver/${userId.value}`;
                 socketUrl = socketUrl.replace("https", "ws").replace("http", "ws");
-                console.log(socketUrl);
-                debugger
                 if (socket !== null && socket instanceof WebSocket) {
                     socket.close()
                     socket = null
@@ -61,9 +72,10 @@ export default defineComponent({
                 // socket.value = new WebSocket(socketUrl);
                 //打开事件
                 socket.onopen = function () {
-                    console.log("websocket已打开");
                     //socket.send("这是来自客户端的消息" + location.href + new Date());
                     webSocketOpen.value = true
+                    flushedOnlinePeople()
+                    message.info("加入成功...")
                 };
                 //获得消息事件
                 socket.onmessage = function (msg) {
@@ -81,12 +93,12 @@ export default defineComponent({
                 };
                 //关闭事件
                 socket.onclose = function () {
-                    console.log("websocket已关闭");
+                    message.info("websocket已关闭");
                     webSocketOpen.value = false
                 };
                 //发生了错误事件
                 socket.onerror = function () {
-                    console.log("websocket发生了错误");
+                    message.error("websocket发生了错误");
                     webSocketOpen.value = false
                 };
             }
@@ -106,19 +118,7 @@ export default defineComponent({
             loading,
             PaperPlaneOutline,
             ReloadOutline,
-            flushedOnlinePeople() {
-                try {
-                    onlinePeopleLoading.value = true
-                    let parms = {messageType: "userList"}
-                    socket.send(JSON.stringify(parms));
-                } catch (e) {
-                    message.error("出错了...")
-                    onlinePeopleLoading.value = false
-                } finally {
-                    onlinePeopleLoading.value = false
-                }
-
-            },
+            flushedOnlinePeople,
             openSocket,
             sendMessage() {
                 if (typeof WebSocket == "undefined") {
@@ -137,7 +137,6 @@ export default defineComponent({
                     userId.value = temVal
                 }
                 openSocket()
-                message.info("加入成功...")
             },
             cleanMessage() {
                 messageList.value = []
