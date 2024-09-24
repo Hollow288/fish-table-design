@@ -108,7 +108,7 @@ export default defineComponent({
     const message = useMessage()
 
 
-    const windowHeight = ref(window.innerHeight)
+    // const windowHeight = ref(window.innerHeight)
 
 
     const needData =  ref([...basicData.value, ...processData.value])
@@ -231,17 +231,18 @@ export default defineComponent({
       }
     ]
 
-    const updateWindowHeight = () => {
-      windowHeight.value = window.innerHeight
-    }
-
-    onMounted(() => {
-      window.addEventListener('resize', updateWindowHeight)
-    })
-
-    onBeforeUnmount(() => {
-      window.removeEventListener('resize', updateWindowHeight)
-    })
+    // const updateWindowHeight = () => {
+    //   windowHeight.value = window.innerHeight
+    // }
+    //
+    // onMounted(() => {
+    //     console.log("1111111")
+    //   window.addEventListener('resize', updateWindowHeight)
+    // })
+    //
+    // onBeforeUnmount(() => {
+    //   window.removeEventListener('resize', updateWindowHeight)
+    // })
 
     const optionsRef = ref<MentionOption[]>([])
 
@@ -311,7 +312,6 @@ export default defineComponent({
 
     return {
       height: '700',
-      windowHeight,
       AddSharp,
       Search,
       TrashBinOutline,
@@ -590,7 +590,7 @@ export default defineComponent({
           {{ '删除' }}
         </n-button>
       </div>
-      <div class="table-wrapper" :style="{ maxHeight: `${windowHeight - 105}px`,marginTop : '5px' }">
+      <div class="table-wrapper" style="height: calc(100vh - 105px);margin-top: 5px ">
         <NTable class="custom-table" size="small" >
           <thead>
           <tr  >
@@ -693,7 +693,7 @@ export default defineComponent({
 .custom-table {
   width: 100%;
   overflow-y: auto;
-  border-collapse: collapse;
+  //border-collapse: collapse;
 }
 
 .custom-table thead th {
