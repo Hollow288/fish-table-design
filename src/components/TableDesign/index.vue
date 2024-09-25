@@ -699,7 +699,7 @@ export default defineComponent({
 .custom-table thead th {
   position: sticky;
   top: 0;
-  background-color: #fff;
+  background-color: rgba(250, 250, 252, 1);
   z-index: 50;
 }
 
@@ -723,4 +723,12 @@ export default defineComponent({
 ::-webkit-scrollbar-thumb:hover {
   background-color: rgba(85, 85, 85, 0.3);
 }
+
+
+.n-table.n-table--bordered {
+    border: none;
+}
+
+
+
 </style>
