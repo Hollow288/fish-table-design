@@ -358,9 +358,9 @@ export default defineComponent({
         editData.value.unshift(...processData.value)
       },
       nameHandleSearch (_: string, prefix: string) {
-        if (prefix === '_') {
-          optionsRef.value = nameOptions
-        }
+        // if (prefix === '_') {
+        //   optionsRef.value = nameOptions
+        // }
       },
       getRowStyle(row){
         return {
@@ -603,7 +603,8 @@ export default defineComponent({
           <tbody>
           <tr v-for="(n, i) in editData" :key="i" @dblclick="setPrimaryKeyDblClick(n)" >
             <td><n-checkbox v-model:checked="n.isChecked" v-if="!n.isPrimaryKey" size="small"/>  <n-icon size="15" v-else ><key-outline/></n-icon></td>
-            <td><n-mention v-model:value="n.fieldName" :options="nameOptions" :prefix="['_']" @search="nameHandleSearch" size="small" /></td>
+<!--            <td><n-mention v-model:value="n.fieldName" :options="nameOptions" :prefix="['_']" @search="nameHandleSearch" size="small" /></td>-->
+            <td><n-mention v-model:value="n.fieldName"  size="small" /></td>
             <td><n-select v-model:value="n.fieldType" filterable tag :options="typeOptions" size="small"/></td>
             <td><NInput v-model:value="n.remark" placeholder="" size="small"/></td>
           </tr>
