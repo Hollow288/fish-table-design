@@ -258,12 +258,15 @@ export default defineComponent({
         if(result.status == '200'){
           if(result.data.status == '200'){
             editData.value = result.data.data
+            tableName.value = ((fileListRef.value[0].name).split('.'))[0]
             message.success('导入成功')
           }else{
             message.error(result.data.message)
+            tableName.value = ''
           }
         }else{
           message.error('出错了')
+          tableName.value = ''
         }
       })
 
@@ -271,7 +274,9 @@ export default defineComponent({
 
 
     const exportFile = () =>{
-
+      editData.value.sort( (a,b)=>{
+        return ( typeof b.isPrimaryKey == 'undefined' ? 0 : b.isPrimaryKey) - ( typeof a.isPrimaryKey == 'undefined' ? 0 : a.isPrimaryKey)
+      })
       UploadAPI.exportFile(editData.value).then(result => {
 
         const blob = result.data;
@@ -281,7 +286,7 @@ export default defineComponent({
         // 创建一个下载链接
         const a = document.createElement('a');
         a.href = url;
-        a.download = `output.docx`; // 设置下载的文件名
+        a.download = `${tableName.value == '' ? 'output' : tableName.value}.docx`; // 设置下载的文件名
         a.target = '_blank';
 
         // 触发点击事件，开始下载
@@ -290,7 +295,7 @@ export default defineComponent({
 
         // 清理临时 URL
         window.URL.revokeObjectURL(url);
-        message.success(`导出成功：output.docx`);
+        message.success(`导出成功：${tableName.value == '' ? 'output' : tableName.value}.docx`);
       })
     }
 
